@@ -9,9 +9,6 @@ module.exports = {
 	},
 	output: {
 		filename: '[name].bundle.js',
-		path: './StyleMe/build/js/'
-	},
-	plugins: [
-
-	]
+		path: './app/build/js/'
+	}
 }
