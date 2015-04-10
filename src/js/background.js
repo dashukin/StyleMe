@@ -13,6 +13,3 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	})
 });
 
-
-
-console.info('\'Allo \'Allo! Event Page for Browser Action');

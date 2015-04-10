@@ -1,19 +1,15 @@
 'use strict';
 
-console.info('Style Me is running!');
-
 var StyleMe = require('./app/StyleMe');
 
 var styleMe = new StyleMe({
 	onConfigurationLoaded: function () {
-		console.log('configuration loaded.');
 		this.updateCSS();
 		chrome.runtime.sendMessage({msg: 'enableBrowserAction'}, function(response) {
 			//console.log(response);
 		});
 	},
 	onConfigurationSaved: function () {
-		console.log('configuration saved.');
 		this.updateCSS();
 	}
 });

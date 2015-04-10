@@ -1,3 +1,5 @@
+var webpack = require('webpack');
+
 module.exports = {
 	entry: {
 		background: './src/js/background.js',
@@ -7,6 +9,9 @@ module.exports = {
 	},
 	output: {
 		filename: '[name].bundle.js',
-		path: './app/build/js/'
-	}
+		path: './StyleMe/build/js/'
+	},
+	plugins: [
+
+	]
 }

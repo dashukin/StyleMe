@@ -94,7 +94,6 @@ StyleMe.prototype.saveConfiguration = function () {
 };
 
 StyleMe.prototype.updateCSS = function () {
-	console.log('Update css...');
 	var self = this,
 		stylesheets = self.configurationData.stylesheets,
 		autoupdate = self.configurationData.autoupdate;
@@ -106,8 +105,6 @@ StyleMe.prototype.updateCSS = function () {
 
 	self.clearUnusedStylesheets();
 	self.processAutoupdate();
-
-	console.log(self.configurationData);
 
 	if (self.configurationData.enable === false) {
 		// turn off stylesheets
@@ -138,19 +135,13 @@ StyleMe.prototype.processAutoupdate = function () {
 	var self = this,
 		stylesheets = self.configurationData.stylesheets;
 
-	console.log('processAutoupdate:');
-	console.log(self.configurationData);
-	console.log(self.configurationData.enable, self.configurationData.autoupdate);
-
 	if ((self.configurationData.enable === true) && (self.configurationData.autoupdate === true)) {
-		console.log('autoupdating...');
 		self.autoupdateInterval = setInterval(function () {
 			stylesheets.forEach(function (stylesheetData) {
 				self.processCSS(stylesheetData.href, stylesheetData.key);
 			});
 		}, self.configurationData.updateFrequency * 1000);
 	} else {
-		console.log('clearing interval...');
 		self.autoupdateInterval && clearInterval(self.autoupdateInterval);
 		self.autoupdateInterval = null;
 	}
@@ -179,7 +170,6 @@ StyleMe.prototype.processCSS = (function () {
 	var head = document.getElementsByTagName('head')[0];
 
 	return function (href, id) {
-		console.log('processing css.');
 		var self = this,
 			link, timeStamp;
 

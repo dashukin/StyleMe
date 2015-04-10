@@ -1,7 +1,5 @@
 'use strict';
 
-$.material.init();
-
 var md5 = require('MD5');
 
 createTabs();
@@ -117,7 +115,6 @@ function collectStylesheets () {
 		styleSheetInputs = Array.prototype.slice.call(stylesheetsList.querySelectorAll('input[type=text]'));
 
 	styleSheetInputs.forEach(function (input, i) {
-		console.log(i);
 		var stylesheetHref = input.value;
 		if (stylesheetHref.length) {
 			styleSheetsData.push({
