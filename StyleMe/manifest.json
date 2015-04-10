@@ -1,0 +1,42 @@
+{
+  "name": "Style Me",
+  "version": "1.0.0",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "manifest_version": 2,
+  "description": "Simple extension to inject custom styles on page.",
+  "icons": {
+    "16": "images/icon-16.png",
+    "128": "images/icon-128.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "scripts": [
+      "build/js/chromereload.bundle.js",
+      "build/js/background.bundle.js"
+    ]
+  },
+  "browser_action": {
+    "default_icon": {
+      "19": "images/icon-19.png",
+      "38": "images/icon-38.png"
+    },
+    "default_title": "Style Me",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "build/js/contentscript.bundle.js"
+      ],
+      "run_at": "document_end",
+      "all_frames": false
+    }
+  ]
+}

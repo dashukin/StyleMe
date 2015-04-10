@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="./bower_components/bootstrap-material-design/dist/css/material.min.css"/>
+        <link rel="stylesheet" href="css/main.css"/>
+    </head>
+    <body>
+        <div class="outer-wrapper">
+            <h2>Style Me configuration</h2>
+
+            <form class="form-horizontal configuration-form" id="configuration-form" action="">
+                <div class="tabs-holder">
+                    <div class="tabs-navigation-holder">
+                        <a class="btn btn-primary btn-xs tab-link active" href="#stylesheets">Stylesheets <span class="badge" id="stylesheets-counter"></span></a>
+                        <a class="btn btn-primary btn-xs tab-link" href="#configuration">Options</a>
+                    </div>
+                </div>
+
+                <div class="tab active" id="stylesheets">
+                    <div class="stylesheets-holder">
+                        <ul class="list-unstyled stylesheets-list" id="stylesheets-list">
+                            <li>
+                                <input class="form-control" type="text" name="" id="" placeholder="path/to/css"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <a class="btn btn-primary btn-xs add-stylesheet" id="add-stylesheet" href="#">Add stylesheet</a>
+                </div>
+
+                <div class="tab" id="configuration">
+                    <div class="configuration-holder" id="configuration-holder">
+
+                        <ul class="list-unstyled configuration-options-list">
+                            <li>
+                                <div class="togglebutton">
+                                    <label>
+                                        <input type="checkbox" id="enable"><span class="toggle"></span> Enable
+                                    </label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="togglebutton">
+                                    <label>
+                                        <input type="checkbox" id="autoupdate"><span class="toggle"></span> Autoupdate
+                                    </label>
+                                </div>
+                            </li>
+                            <li>
+                                <label class="update-frequency-label" for="update-frequency">
+                                    <input class="form-control" type="text" pattern="^[0-9]+$" id="update-frequency" value="1"/>
+                                    <span>Update frequency (s)</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="submit-holder">
+                    <button type="submit" class="btn btn-primary" id="save-configuration">Save</button>
+                    <span class="label label-success save-status success" id="save-status-success">Success!</span>
+                </div>
+
+            </form>
+
+        </div>
+
+        <script src="./build/js/popup.bundle.js"></script>
+    </body>
+</html>

@@ -1,0 +1,106 @@
+body {
+	min-width: 300px;
+	min-height: 150px;
+	margin: 0;
+  	padding: 20px 20px 40px;
+}
+
+.outer-wrapper {
+
+}
+.tabs-holder {
+
+}
+.tabs-navigation-holder:before,
+.tabs-navigation-holder:after {
+	content: '';
+	display: table;
+	clear: both;
+}
+.tabs-navigation-holder a {
+	display: block;
+	width: 48%;
+	margin-right: 1%;
+	margin-left: 1%;
+	float: left;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+.configuration-holder {
+	padding: 15px 0;
+}
+.configuration-holder h2 {
+	margin: 0;
+}
+
+.configuration-options-list {
+
+}
+.configuration-options-list li {
+	margin: 5px 0;
+}
+.configuration-options-list label {
+	cursor: pointer;
+}
+.configuration-options-list input {
+	display: inline-block;
+	width: 40px;
+}
+
+.stylesheets-holder {
+	padding: 15px 0;
+}
+.stylesheets-holder li {
+	display: block;
+	position: relative;
+}
+.stylesheets-holder li input[type=text] {
+	width: 100%;
+	padding-right: 20px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	box-sizing: border-box;
+}
+.stylesheets-holder li input[type=text] ~ a > span {
+	font-size: 18px;
+	position: absolute;
+	right: 0;
+	top: 3px;
+}
+
+.update-frequency-label > input {
+	text-align: center;
+}
+
+.save-status {
+	display: none;
+	color: #fff;
+	padding: 3px 5px;
+}
+.save-status.visible {
+	display: inline-block;
+}
+
+
+/* tabs */
+.tab {
+	display: none;
+}
+.tab.active {
+	display: block;
+}
+
+/* common styles */
+a:focus {
+	outline: none;
+}
+.list-unstyled {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+
+
