@@ -13,7 +13,9 @@ Style Me is a chrome extension for adding any hosted css files into webpage.
 *Note: it takes some time depending on your internet connection to load and apply your styles into webpage. For development just use any local server so your files will load immediately.
 
 #Usage
-This extension could be installed via chrome webstore. Just follow <a target="_blank" href="https://chrome.google.com/webstore/detail/style-me/ihhjaipabfigpfdpggebhbginjbolkbh">this link</a>
+This extension could be installed via chrome webstore. 
+Just follow <a target="_blank" href="https://chrome.google.com/webstore/detail/style-me/ihhjaipabfigpfdpggebhbginjbolkbh">this link</a>.
+Once you have installed extension - just reload your pages you want to modify to make app button become activated.
 
 
 
