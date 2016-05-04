@@ -195,4 +195,4 @@ StyleMe.prototype.processCSS = (function () {
 	}
 }());
 
-module.exports = StyleMe;
+export default StyleMe;

@@ -1,11 +1,11 @@
 'use strict';
 
-var StyleMe = require('./app/StyleMe');
+import StyleMe from './app/StyleMe';
 
 var styleMe = new StyleMe({
 	onConfigurationLoaded: function () {
 		this.updateCSS();
-		chrome.runtime.sendMessage({msg: 'enableBrowserAction'}, function(response) {
+		chrome.runtime.sendMessage({msg: 'enableBrowserAction'}, (response) => {
 			//console.log(response);
 		});
 	},
@@ -14,8 +14,10 @@ var styleMe = new StyleMe({
 	}
 });
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	var action = request.action;
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+
+	let action = request.action;
+
 	if (action === 'getConfiguration') {
 		sendResponse({
 			status: true,

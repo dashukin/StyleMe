@@ -1,6 +1,16 @@
+/**
+ * Popup script
+ */
+
 'use strict';
 
-var md5 = require('MD5');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './components/app-component';
+import md5 from 'MD5';
+
+ReactDOM.render(<App/>, document.getElementById('styleme-app'));
+
 
 createTabs();
 
@@ -169,6 +179,7 @@ function createTabs () {
 };
 
 function sendMessage (data, callback) {
+	
 	data = Object.prototype.toString.call(data).slice(8, -1) === 'Object' ? data : {};
 
 	chrome.tabs.getSelected(null, function(tab) {
