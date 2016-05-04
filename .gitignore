@@ -2,3 +2,9 @@
 node_modules
 info/
 appData/
+
+/app/build
+
+/example
+
+/app-info
