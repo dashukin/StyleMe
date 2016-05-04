@@ -1,0 +1,7 @@
+{
+	"plugins": ["transform-react-jsx", "syntax-class-properties", "transform-class-properties"],
+	"ignore": [
+		"node_modules"
+	],
+	"presets": ["es2015", "react"]
+}
