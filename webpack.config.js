@@ -2,13 +2,24 @@ var webpack = require('webpack');
 
 module.exports = {
 	entry: {
-		background: './src/js/background.js',
-		chromereload: './src/js/chromereload.js',
-		contentscript: './src/js/contentscript.js',
-		popup: './src/js/popup.js'
+		background: './src/js/background',
+		contentscript: './src/js/contentscript',
+		popup: './src/js/popup'
 	},
 	output: {
 		filename: '[name].bundle.js',
 		path: './app/build/js/'
-	}
+	},
+	module: {
+		loaders: [
+			{
+				test: /\.js$/,
+				exclude: /node_modules/,
+				loaders: ['babel-loader']
+			}
+		]
+	},
+	plugins: [
+		new webpack.NoErrorsPlugin()
+	]
 }
