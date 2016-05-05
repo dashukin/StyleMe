@@ -3,7 +3,7 @@ node_modules
 info/
 appData/
 
-/app/build
+app/build/
 
 /example
 
