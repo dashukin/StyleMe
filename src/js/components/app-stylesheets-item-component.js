@@ -32,6 +32,7 @@ class StylesheetItemComponent extends React.Component {
 					hintText="path/to/css/file"
 					defaultValue={stylesheetConfig.src}
 					style={{width: '80%'}}
+					onChange={this.changeHandler}
 				/>
 
 				<IconButton
@@ -47,11 +48,20 @@ class StylesheetItemComponent extends React.Component {
 
 	removeField = () => {
 
-		let {stylesheetConfig} = this.props;
-
-		let fieldKey = stylesheetConfig.key;
+		let fieldKey = this.props.stylesheetConfig.key;
 
 		AppActions.removeField(fieldKey);
+	}
+
+	changeHandler = (e) => {
+
+		let fieldKey = this.props.stylesheetConfig.key;
+
+		AppActions.addInputValue({
+			key: fieldKey,
+			value: e.target.value
+		});
+		
 	}
 
 }

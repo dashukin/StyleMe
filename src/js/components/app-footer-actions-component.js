@@ -2,6 +2,8 @@
 'use strict';
 
 import React from 'react';
+import AppActions from '../actions/actions';
+import FlatButton from 'material-ui/lib/flat-button';
 
 class FooterActionsComponent extends React.Component {
 
@@ -12,9 +14,17 @@ class FooterActionsComponent extends React.Component {
 	render () {
 		return (
 			<div className="footer-actions">
-				Footer actions
+				<FlatButton
+					label="Save"
+					primary={true}
+					onClick={this.saveConfiguration}
+				/>
 			</div>
 		);
+	}
+
+	saveConfiguration = () => {
+		AppActions.saveConfiguration();
 	}
 
 }

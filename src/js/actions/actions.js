@@ -20,7 +20,15 @@ export default {
 			payload: {key}
 		});
 	},
-	addStylesheet: () => {
-
+	addInputValue: ({key, value}) => {
+		AppDispatcher.dispatch({
+			actionType: AppConstants.ADD_INPUT_VALUE,
+			payload: {key, value}
+		});
+	},
+	saveConfiguration: () => {
+		AppDispatcher.dispatch({
+			actionType: AppConstants.SAVE_CONFIGURATION
+		});
 	}
 }

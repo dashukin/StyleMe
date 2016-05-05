@@ -6,6 +6,7 @@ import {EventEmitter} from 'events';
 import AppDispatcher from '../dispatchers/dispatcher';
 import AppConstants from '../constants/constants';
 import {Map} from 'immutable';
+import MD5 from 'MD5';
 
 class AppStore extends EventEmitter {
 
@@ -21,8 +22,11 @@ class AppStore extends EventEmitter {
 				stylesheets: []
 			}),
 			// TODO: move to react-router
-			viewType: 'stylesheets' // stylesheets, options
+			viewType: 'stylesheets', // stylesheets, options
+			configurationKey: null
 		});
+
+
 
 		AppDispatcher.register(({actionType, payload}) => {
 
@@ -55,9 +59,22 @@ class AppStore extends EventEmitter {
 				case AppConstants.REMOVE_FIELD:
 
 					this.removeField(payload.key);
+
+					break;
+
+				case AppConstants.ADD_INPUT_VALUE:
+
+					this.addInputValue({
+						key: 	payload.key,
+						value: 	payload.value
+					});
+
+					break;
 			}
 
 		});
+
+		this.getConfiguration();
 
 	}
 	
@@ -92,23 +109,34 @@ class AppStore extends EventEmitter {
 	 */
 	getConfiguration () {
 
-		console.log('getConfiguration');
-		
-		this.__sendMessage({
-			payload: {
-				action: 'getConfiguration'
-			},
-			callback: ({status, configuration}) => {
+		let configurationKey = this.storeData.get('configurationKey');
 
-				// TODO: confirm status usage
-				if (!status) {
-					return;
-				}
+		if (configurationKey) {
+			this.getFromStorage(configurationData => {
+				this.processConfiguration(configurationData);
+			});
+		} else {
+			this.createConfigurationKey(() => {
+				this.getFromStorage(configurationData => {
+					this.processConfiguration(configurationData);
+				});
+			});
+		}
 
-				this.storeData.update('configuration', () => configuration);
-				this.emitChange();
-			}
-		});
+	}
+
+	processConfiguration (configurationData) {
+
+		let configurationKey = this.storeData.get('configurationKey');
+
+		if (configurationData.hasOwnProperty(configurationKey)) {
+			let configuration = JSON.parse(configurationData[configurationKey]);
+			this.storeData = this.storeData.update('configuration', c => Map(configuration));
+			console.log(this.storeData.get('configuration'));
+			this.emitChange();
+		} else {
+			console.error('1');
+		}
 
 	}
 
@@ -117,36 +145,86 @@ class AppStore extends EventEmitter {
 	 */
 	saveConfiguration () {
 
-		console.log('saveConfiguration');
+		console.log('save configuration');
 
 		let self = this;
 
-		this.__sendMessage({
-			payload: {
-				action: 'saveConfiguration',
-				data: self.storeData.configuration.toObject()
-			},
-			callback: ({status}) => {
+		// let configurationKey = this.configurationKey;
+		//
+		// let configurationObject = {};
+		// configurationObject[configurationKey] = configuration;
+		//
+		// chrome.storage.local.set(configurationObject, () => {
+		// 	();
+		// });
 
-				// TODO: confirm status usage
+		let configurationKey 	= 	this.storeData.get('configurationKey');
+		let configuration 		= 	this.storeData.get('configuration');
+		let configurationJSON 	= 	JSON.stringify(configuration);
 
-				if (!status) {
-					return;
-				}
+		if (configurationKey) {
+			this.setToStorage(configurationJSON, () => {
 
+			});
+		} else {
+			this.createConfigurationKey(() => {
+				this.setToStorage(configurationJSON, () => {
 
-			}
-		})
+				});
+			});
+		}
 
-		this.emitChange();
+	}
+
+	createConfigurationKey (callback) {
+
+		chrome.tabs.getSelected(null, (tab) => {
+
+			console.log('selected tab', tab);
+
+			let tabUrl = tab.url;
+			let linkParser = document.createElement('a');
+			linkParser.href = tabUrl;
+
+			this.storeData = this.storeData.update('configurationKey', c => MD5(linkParser.host));
+
+			callback();
+
+		});
+	}
+
+	getFromStorage (callback) {
+
+		let configurationKey = this.storeData.get('configurationKey');
+
+		chrome.storage.local.get(configurationKey, (data) => {
+			callback.call(null, data);
+		});
+
+	}
+
+	setToStorage (cofigurationJSON, callback) {
+
+		let configurationKey = this.storeData.get('configurationKey');
+
+		let configurationObject = {};
+		configurationObject[configurationKey] = cofigurationJSON;
+
+		chrome.storage.local.set(configurationObject, () => {
+			callback();
+		});
 
 	}
 
 	__sendMessage ({payload, callback}) {
 
+		console.log('sendMessage');
+
 		chrome.tabs.getSelected(null, (tab) => {
 
 			chrome.tabs.sendMessage(tab.id, payload, response => {
+
+				console.log('__sendMessage response', response);
 
 				if (typeof callback === 'function') {
 					callback.call(null, response);
@@ -181,13 +259,29 @@ class AppStore extends EventEmitter {
 				return stylesheet.key === key;
 			});
 
-			console.log(stylesheetIndex);
-
 			if (!!~stylesheetIndex) {
 				stylesheets.splice(stylesheetIndex, 1);
 			}
 
-			console.log(stylesheets);
+			return stylesheets;
+
+		});
+
+		this.emitChange();
+
+	}
+
+	addInputValue ({key, value}) {
+
+		this.storeData = this.storeData.updateIn(['configuration', 'stylesheets'], stylesheets => {
+
+			let stylesheetIndex = stylesheets.findIndex(stylesheet => {
+				return stylesheet.key === key;
+			});
+
+			if (!!~stylesheetIndex) {
+				stylesheets[stylesheetIndex].src = value;
+			}
 
 			return stylesheets;
 
