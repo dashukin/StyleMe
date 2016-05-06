@@ -34,11 +34,10 @@ class StylesheetsComponent extends React.Component {
 	render () {
 
 		let configuration = this.props.configuration;
-		let stylesheetsData = configuration ? configuration.get('stylesheets') : [];
 
-		console.warn(stylesheetsData);
+		let stylesheetsData = configuration ? configuration.get('styleSheets') : [];
 
-		let stylesheets = stylesheetsData.map((stylesheetConfig) => {
+		let styleSheets = stylesheetsData.map((stylesheetConfig) => {
 			return <StylesheetsItemComponent
 				key={"stylesheet-item-" + stylesheetConfig.key}
 				stylesheetConfig={stylesheetConfig}
@@ -49,7 +48,7 @@ class StylesheetsComponent extends React.Component {
 			<div className="view stylesheets-view">
 
 				<div className="stylesheets-list">
-					{stylesheets}
+					{styleSheets}
 				</div>
 
 				<div className="">

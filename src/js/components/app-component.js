@@ -88,6 +88,8 @@ class AppComponent extends React.Component {
 
 		storeData = AppStore.getStoreData();
 
+		console.log('updateState', storeData.toObject());
+
 		this.setState({
 			configuration: storeData.get('configuration'),
 			viewType: storeData.get('viewType')
