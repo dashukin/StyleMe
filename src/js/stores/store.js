@@ -17,12 +17,11 @@ class AppStore extends EventEmitter {
 		this.storeData = Map({
 			configuration: Map({
 				enable: false,
+				autoUpdate: false,
 				updateFrequency: 2,
-				autoupdate: false,
-				stylesheets: []
+				styleSheets: []
 			}),
-			// TODO: move to react-router
-			viewType: 'stylesheets', // stylesheets, options
+			viewType: 'stylesheets', // stylesheets || options
 			configurationKey: null
 		});
 
@@ -68,6 +67,24 @@ class AppStore extends EventEmitter {
 						key: 	payload.key,
 						value: 	payload.value
 					});
+
+					break;
+
+				case AppConstants.SET_ENABLE:
+
+					this.setEnable(payload.enable);
+
+					break;
+
+				case AppConstants.SET_AUTO_UPDATE:
+
+					this.setAutoUpdate(payload.autoUpdate);
+
+					break;
+
+				case AppConstants.SET_UPDATE_FREQUENCY:
+
+					this.setUpdateFrequency(payload.updateFrequency);
 
 					break;
 			}
@@ -132,10 +149,7 @@ class AppStore extends EventEmitter {
 		if (configurationData.hasOwnProperty(configurationKey)) {
 			let configuration = JSON.parse(configurationData[configurationKey]);
 			this.storeData = this.storeData.update('configuration', c => Map(configuration));
-			console.log(this.storeData.get('configuration'));
 			this.emitChange();
-		} else {
-			console.error('1');
 		}
 
 	}
@@ -145,42 +159,43 @@ class AppStore extends EventEmitter {
 	 */
 	saveConfiguration () {
 
-		console.log('save configuration');
-
-		let self = this;
-
-		// let configurationKey = this.configurationKey;
-		//
-		// let configurationObject = {};
-		// configurationObject[configurationKey] = configuration;
-		//
-		// chrome.storage.local.set(configurationObject, () => {
-		// 	();
-		// });
-
 		let configurationKey 	= 	this.storeData.get('configurationKey');
 		let configuration 		= 	this.storeData.get('configuration');
 		let configurationJSON 	= 	JSON.stringify(configuration);
 
 		if (configurationKey) {
 			this.setToStorage(configurationJSON, () => {
-
+				this.applyConfiguration()
 			});
 		} else {
 			this.createConfigurationKey(() => {
 				this.setToStorage(configurationJSON, () => {
-
+					this.applyConfiguration();
 				});
 			});
 		}
 
 	}
 
+	applyConfiguration () {
+
+		let self = this;
+
+		this.__sendMessage({
+			payload: {
+				action: 'applyConfiguration',
+				configuration: self.storeData.get('configuration').toObject()
+			},
+			callback: (response) => {
+				console.log(response);
+			}
+		});
+
+	}
+
 	createConfigurationKey (callback) {
 
 		chrome.tabs.getSelected(null, (tab) => {
-
-			console.log('selected tab', tab);
 
 			let tabUrl = tab.url;
 			let linkParser = document.createElement('a');
@@ -218,13 +233,9 @@ class AppStore extends EventEmitter {
 
 	__sendMessage ({payload, callback}) {
 
-		console.log('sendMessage');
-
 		chrome.tabs.getSelected(null, (tab) => {
 
 			chrome.tabs.sendMessage(tab.id, payload, response => {
-
-				console.log('__sendMessage response', response);
 
 				if (typeof callback === 'function') {
 					callback.call(null, response);
@@ -240,11 +251,11 @@ class AppStore extends EventEmitter {
 
 		let stylesheetModel = {
 			src: '',
-			overrideOriginal: false,
+			overrideOriginal: true,
 			key: '' + Math.floor(Math.random() * 10e7) + (new Date()).getTime()
 		};
 
-		this.storeData = this.storeData.updateIn(['configuration', 'stylesheets'], stylesheets => {
+		this.storeData = this.storeData.updateIn(['configuration', 'styleSheets'], stylesheets => {
 			return stylesheets.push(stylesheetModel), stylesheets
 		});
 
@@ -253,7 +264,7 @@ class AppStore extends EventEmitter {
 
 	removeField (key) {
 
-		this.storeData = this.storeData.updateIn(['configuration', 'stylesheets'], stylesheets => {
+		this.storeData = this.storeData.updateIn(['configuration', 'styleSheets'], stylesheets => {
 
 			let stylesheetIndex = stylesheets.findIndex(stylesheet => {
 				return stylesheet.key === key;
@@ -273,19 +284,43 @@ class AppStore extends EventEmitter {
 
 	addInputValue ({key, value}) {
 
-		this.storeData = this.storeData.updateIn(['configuration', 'stylesheets'], stylesheets => {
+		this.storeData = this.storeData.updateIn(['configuration', 'styleSheets'], styleSheets => {
 
-			let stylesheetIndex = stylesheets.findIndex(stylesheet => {
+			let stylesheetIndex = styleSheets.findIndex(stylesheet => {
 				return stylesheet.key === key;
 			});
 
 			if (!!~stylesheetIndex) {
-				stylesheets[stylesheetIndex].src = value;
+				styleSheets[stylesheetIndex].src = value;
 			}
 
-			return stylesheets;
+			return styleSheets;
 
 		});
+
+		this.emitChange();
+
+	}
+
+	setEnable (enable) {
+
+		this.storeData = this.storeData.updateIn(['configuration', 'enable'], v => enable);
+
+		this.emitChange();
+
+	}
+
+	setAutoUpdate (autoUpdate) {
+
+		this.storeData = this.storeData.updateIn(['configuration', 'autoUpdate'], v => autoUpdate);
+
+		this.emitChange();
+
+	}
+
+	setUpdateFrequency (updateFrequency) {
+
+		this.storeData = this.storeData.updateIn(['configuration', 'updateFrequency'], v => updateFrequency);
 
 		this.emitChange();
 
