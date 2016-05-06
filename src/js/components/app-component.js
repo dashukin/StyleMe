@@ -74,9 +74,7 @@ class AppComponent extends React.Component {
 
 				<FooterActionsComponent />
 
-				<pre>
-					{JSON.stringify(configuration, null, 4)}
-				</pre>
+				
 			</div>
 		);
 	}
