@@ -2,9 +2,23 @@
 
 import StyleMe from './app/StyleMe';
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
-	let action = request.action;
+	var action = request.action;
+
+	switch (action) {
+
+		case 'applyConfiguration':
+
+			StyleMe.applyConfiguration(request.configuration);
+
+			sendResponse({
+				success: true
+			});
+
+			break;
+
+	}
 
 	
 });
