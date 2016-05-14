@@ -3,7 +3,7 @@
 
 import React from 'react';
 import AppActions from '../actions/actions';
-import FlatButton from 'material-ui/lib/flat-button';
+import FlatButton from 'material-ui/FlatButton';
 
 
 class NavigationComponent extends React.Component {

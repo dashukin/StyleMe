@@ -3,9 +3,9 @@
 
 import React from 'react';
 import AppActions from '../actions/actions';
-import TextField from 'material-ui/lib/text-field';
-import IconButton from 'material-ui/lib/icon-button';
-import DeleteIcon from 'material-ui/lib/svg-icons/navigation/close';
+import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton';
+import DeleteIcon from 'material-ui/svg-icons/navigation/close';
 
 
 class StylesheetItemComponent extends React.Component {

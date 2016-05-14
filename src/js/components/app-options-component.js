@@ -3,8 +3,8 @@
 
 import React from 'react';
 import AppActions from '../actions/actions';
-import Checkbox from 'material-ui/lib/checkbox';
-import TextField from 'material-ui/lib/text-field';
+import Checkbox from 'material-ui/Checkbox';
+import TextField from 'material-ui/TextField';
 
 class OptionsComponent extends React.Component {
 
@@ -15,9 +15,9 @@ class OptionsComponent extends React.Component {
 	render () {
 
 		let configuration = this.props.configuration;
-		let enable = configuration.get('enable');
-		let checked = configuration.get('autoUpdate');
-		let updateFrequency = parseInt(configuration.get('updateFrequency'), 10) || 2;
+		let enable = configuration ? configuration.get('enable') : false;
+		let checked = configuration ? configuration.get('autoUpdate'): false;
+		let updateFrequency = configuration ? parseInt(configuration.get('updateFrequency'), 10) : 2;
 
 		return (
 			<div className="view options-view">

@@ -4,12 +4,13 @@ import React from 'react';
 import AppStore from '../stores/store';
 import AppActions from '../actions/actions';
 import StylesheetsComponent from './app-stylesheets-component';
-import NavigationComponent from './app-navigation-component';
 import OptionsComponent from './app-options-component';
 import FooterActionsComponent from './app-footer-actions-component';
 
-import ThemeManager from 'material-ui/lib/styles/theme-manager.js';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import AppTheme from '../theme/app-theme.js';
+
+import {Tabs, Tab} from 'material-ui/Tabs';
 
 class AppComponent extends React.Component {
 
@@ -20,14 +21,14 @@ class AppComponent extends React.Component {
 
 		this.state = {
 			configuration: null,
-			viewType: null
+			viewType: 'stylesheets'
 		};
 
 	}
 
 	getChildContext () {
 		return {
-			muiTheme: ThemeManager.getMuiTheme(AppTheme)
+			muiTheme: getMuiTheme(AppTheme)
 		}
 	}
 
@@ -51,46 +52,44 @@ class AppComponent extends React.Component {
 
 		configuration = state.configuration !== null
 			? state.configuration
-			: {};
+			: null;
 
 		viewType = state.viewType;
 
 		return (
 			<div>
 
-				<NavigationComponent/>
-
-				{
-					viewType === 'stylesheets'
-
-						? <StylesheetsComponent configuration={configuration} />
-
-						: viewType === 'options'
-
-							? <OptionsComponent configuration={configuration} />
-
-							: 'Invalid value of viewType...'
-				}
+				<Tabs value={viewType}>
+					<Tab label="CSS" value="stylesheets" onClick={this.handleTabClick.bind(this, 'stylesheets')}>
+						<StylesheetsComponent configuration={configuration} />
+					</Tab>
+					<Tab label="Options" value="options" onClick={this.handleTabClick.bind(this, 'options')}>
+						<OptionsComponent configuration={configuration} />
+					</Tab>
+				</Tabs>
 
 				<FooterActionsComponent />
 
-				
 			</div>
 		);
 	}
 
+	handleTabClick = (value, e) => {
+
+		this.setState({
+			viewType: value
+		});
+
+	}
+
 	updateState = () => {
 
-		let storeData,
-			viewType;
+		let storeData;
 
 		storeData = AppStore.getStoreData();
 
-		console.log('updateState', storeData.toObject());
-
 		this.setState({
-			configuration: storeData.get('configuration'),
-			viewType: storeData.get('viewType')
+			configuration: storeData.get('configuration')
 		});
 
 	}

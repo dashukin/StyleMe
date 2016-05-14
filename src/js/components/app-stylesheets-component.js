@@ -4,7 +4,7 @@
 import React from 'react';
 import AppActions from '../actions/actions';
 import StylesheetsItemComponent from './app-stylesheets-item-component';
-import FlatButton from 'material-ui/lib/flat-button';
+import FlatButton from 'material-ui/FlatButton';
 
 const viewPrefix = 'stylesheets';
 
