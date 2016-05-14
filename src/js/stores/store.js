@@ -91,7 +91,9 @@ class AppStore extends EventEmitter {
 
 		});
 
-		this.getConfiguration();
+		this.getConfiguration().then(() => {
+			this.applyConfiguration();
+		});
 
 	}
 	
@@ -126,19 +128,24 @@ class AppStore extends EventEmitter {
 	 */
 	getConfiguration () {
 
-		let configurationKey = this.storeData.get('configurationKey');
+		return new Promise((resolve, reject) => {
 
-		if (configurationKey) {
-			this.getFromStorage(configurationData => {
-				this.processConfiguration(configurationData);
-			});
-		} else {
-			this.createConfigurationKey(() => {
-				this.getFromStorage(configurationData => {
+			let configurationKey = this.storeData.get('configurationKey');
+
+			if (configurationKey) {
+				this.getFromStorage().then(configurationData => {
 					this.processConfiguration(configurationData);
+					resolve();
 				});
-			});
-		}
+			} else {
+				this.createConfigurationKey().then(() => {
+					this.getFromStorage().then(configurationData => {
+						this.processConfiguration(configurationData);
+						resolve();
+					});
+				});
+			}
+		});
 
 	}
 
@@ -164,12 +171,12 @@ class AppStore extends EventEmitter {
 		let configurationJSON 	= 	JSON.stringify(configuration);
 
 		if (configurationKey) {
-			this.setToStorage(configurationJSON, () => {
+			this.setToStorage(configurationJSON).then(() => {
 				this.applyConfiguration()
 			});
 		} else {
-			this.createConfigurationKey(() => {
-				this.setToStorage(configurationJSON, () => {
+			this.createConfigurationKey().then(() => {
+				this.setToStorage(configurationJSON).then(() => {
 					this.applyConfiguration();
 				});
 			});
@@ -185,64 +192,76 @@ class AppStore extends EventEmitter {
 			payload: {
 				action: 'applyConfiguration',
 				configuration: self.storeData.get('configuration').toObject()
-			},
-			callback: (response) => {
-				console.log(response);
 			}
-		});
+		}).then((r) => console.log(r));
 
 	}
 
-	createConfigurationKey (callback) {
+	createConfigurationKey () {
 
-		chrome.tabs.getSelected(null, (tab) => {
+		return new Promise((resolve, reject) => {
 
-			let tabUrl = tab.url;
-			let linkParser = document.createElement('a');
-			linkParser.href = tabUrl;
+			chrome.tabs.getSelected(null, (tab) => {
 
-			this.storeData = this.storeData.update('configurationKey', c => MD5(linkParser.host));
+				let tabUrl = tab.url;
+				let linkParser = document.createElement('a');
+				linkParser.href = tabUrl;
 
-			callback();
+				this.storeData = this.storeData.update('configurationKey', c => MD5(linkParser.host));
 
-		});
-	}
-
-	getFromStorage (callback) {
-
-		let configurationKey = this.storeData.get('configurationKey');
-
-		chrome.storage.local.get(configurationKey, (data) => {
-			callback.call(null, data);
-		});
-
-	}
-
-	setToStorage (cofigurationJSON, callback) {
-
-		let configurationKey = this.storeData.get('configurationKey');
-
-		let configurationObject = {};
-		configurationObject[configurationKey] = cofigurationJSON;
-
-		chrome.storage.local.set(configurationObject, () => {
-			callback();
-		});
-
-	}
-
-	__sendMessage ({payload, callback}) {
-
-		chrome.tabs.getSelected(null, (tab) => {
-
-			chrome.tabs.sendMessage(tab.id, payload, response => {
-
-				if (typeof callback === 'function') {
-					callback.call(null, response);
-				}
+				resolve();
 
 			});
 
+		});
+
+	}
+
+	getFromStorage () {
+
+		return new Promise((resolve, reject) => {
+
+			let configurationKey = this.storeData.get('configurationKey');
+
+			chrome.storage.local.get(configurationKey, (data) => {
+				resolve(data);
+			});
+
+		});
+
+	}
+
+	setToStorage (cofigurationJSON) {
+
+		return new Promise((resolve, reject) => {
+
+			let configurationKey = this.storeData.get('configurationKey');
+
+			let configurationObject = {};
+			
+			configurationObject[configurationKey] = cofigurationJSON;
+
+			chrome.storage.local.set(configurationObject, () => {
+				resolve();
+			});
+
+		});
+
+	}
+
+	__sendMessage ({payload}) {
+
+		return new Promise((resolve, reject) => {
+
+			chrome.tabs.getSelected(null, (tab) => {
+
+				chrome.tabs.sendMessage(tab.id, payload, response => {
+
+					resolve(response);
+
+				});
+
+			});
 		});
 
 	}
