@@ -20,8 +20,6 @@ class StyleMe {
 
 				let	stylesheetKey = MD5(stylesheet['ownerNode'].getAttribute('href'));
 
-				console.log(stylesheet['ownerNode'].getAttribute('href'));
-
 				collection[stylesheetKey] = stylesheet['ownerNode'];
 			}
 
@@ -36,8 +34,6 @@ class StyleMe {
 	}
 
 	applyConfiguration (configuration) {
-
-		console.log('applyConfiguration', configuration);
 
 		this.configuration = configuration;
 
