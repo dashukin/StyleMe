@@ -100,6 +100,10 @@ class StyleMe {
 
 		styleSheets.forEach(styleSheet => {
 
+			if (!styleSheet.src) {
+				return;
+			}
+
 			// create new styleSheet
 			let newStylesheet = document.createElement('link');
 
