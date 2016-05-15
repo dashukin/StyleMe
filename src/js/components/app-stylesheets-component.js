@@ -33,14 +33,15 @@ class StylesheetsComponent extends React.Component {
 
 	render () {
 
-		let configuration = this.props.configuration;
+		let {configuration, originalStyleSheets} = this.props;
 
-		let stylesheetsData = configuration ? configuration.get('styleSheets') : [];
+		let stylesheetsData = !!configuration ? configuration.get('styleSheets') : [];
 
 		let styleSheets = stylesheetsData.map((stylesheetConfig) => {
 			return <StylesheetsItemComponent
 				key={"stylesheet-item-" + stylesheetConfig.key}
 				stylesheetConfig={stylesheetConfig}
+				originalStyleSheets={originalStyleSheets}
 			/>
 		});
 
