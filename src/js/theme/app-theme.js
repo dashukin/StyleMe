@@ -1,6 +1,6 @@
 'use strict';
 
-import {lightBlue700, white, darkBlack} from 'material-ui/styles/colors';
+import {lightBlue800, lightBlue700, lightBlue500, lightBlue300, lightBlue100, white, darkBlack} from 'material-ui/styles/colors';
 import Spacing from 'material-ui/styles/spacing.js';
 
 /*
@@ -13,15 +13,15 @@ export default {
 	spacing: Spacing,
 	fontFamily: 'Roboto, sans-serif',
 	palette: {
-		primary1Color: 	lightBlue700,
-		primary2Color: 	lightBlue700,
-		primary3Color: 	lightBlue700,
-		accent1Color: 	lightBlue700,
-		accent2Color: 	lightBlue700,
-		accent3Color: 	lightBlue700,
+		primary1Color: 	lightBlue800,
+		primary2Color: 	lightBlue300,
+		primary3Color: 	lightBlue100,
+		accent1Color: 	lightBlue800,
+		accent2Color: 	lightBlue300,
+		accent3Color: 	lightBlue100,
 		textColor: 		darkBlack,
 		alternateTextColor: white,
-		canvasColor: lightBlue700,
+		canvasColor: white,
 		borderColor: lightBlue700
 	}
 };
