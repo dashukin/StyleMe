@@ -54,5 +54,10 @@ export default {
 		AppDispatcher.dispatch({
 			actionType: AppConstants.SAVE_CONFIGURATION
 		});
+	},
+	applyConfiguration: () => {
+		AppDispatcher.dispatch({
+			actionType: AppConstants.APPLY_CONFIGURATION
+		});
 	}
 }
