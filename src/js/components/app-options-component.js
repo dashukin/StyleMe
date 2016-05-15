@@ -29,8 +29,8 @@ class OptionsComponent extends React.Component {
 
 					<Subheader>Base configuration:</Subheader>
 
-					<ListItem primaryText="Inject styles" rightToggle={<Toggle defaultToggled={enable} onToggle={this.handleEnabling} />} />
-					<ListItem primaryText="Auto update" rightToggle={<Toggle defaultToggled={autoUpdate} onToggle={this.handleAutoUpdate} />} />
+					<ListItem primaryText="Inject styles" rightToggle={<Toggle defaultToggled={enable} toggled={enable} onToggle={this.handleEnabling} />} />
+					<ListItem primaryText="Auto update" rightToggle={<Toggle defaultToggled={autoUpdate} toggled={autoUpdate} onToggle={this.handleAutoUpdate} />} />
 
 					{autoUpdate
 						? 	<ListItem
