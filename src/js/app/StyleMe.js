@@ -12,15 +12,19 @@ class StyleMe {
 		this.documentHead = document.getElementsByTagName('head')[0];
 		this.appAttribute = 'data-style-me';
 
-		this.originalStylesheets = Array.prototype.filter.call(document.styleSheets, stylesheet => {
-			return !stylesheet['ownerNode'].hasAttribute(this.appAttribute);
-		}).reduce((collection, stylesheet) => {
+		this.originalStyleSheets = Array.prototype.filter.call(document.styleSheets, styleSheet => {
+			// exclude injected stylesheets and those that have been disabled by default
+			return !styleSheet['ownerNode'].hasAttribute(this.appAttribute) && !styleSheet['ownerNode'].disabled;
+		}).reduce((collection, styleSheet) => {
 
-			if (typeof stylesheet.href === 'string') {
+			if (typeof styleSheet.href === 'string') {
 
-				let	stylesheetKey = MD5(stylesheet['ownerNode'].getAttribute('href'));
+				let	styleSheetKey = MD5(styleSheet['ownerNode'].getAttribute('href'));
 
-				collection[stylesheetKey] = stylesheet['ownerNode'];
+				collection[styleSheetKey] = {
+					node: styleSheet['ownerNode'],
+					src: styleSheet.href
+				};
 			}
 
 			return collection;
@@ -43,7 +47,7 @@ class StyleMe {
 
 	processConfiguration () {
 
-		let configuration = this.configuration;
+		let {configuration} = this;
 
 		if (!(Object.prototype.toString.call(configuration).slice(8, -1) === 'Object')) {
 			return;
@@ -61,28 +65,28 @@ class StyleMe {
 
 	removeStylesheets () {
 
-		let injectedStyleSheets = this.injectedStyleSheets;
+		let {injectedStyleSheets, originalStyleSheets} = this;
 
-		let originalStyleSheets = this.originalStylesheets;
+		// remove all injected stylesheets
+		for (let styleSheet in injectedStyleSheets) {
+			if (injectedStyleSheets.hasOwnProperty(styleSheet)) {
 
-		for (let stylesheet in injectedStyleSheets) {
-			if (injectedStyleSheets.hasOwnProperty(stylesheet)) {
-
-				let injectedStylesheet = injectedStyleSheets[stylesheet].node;
+				let injectedStylesheet = injectedStyleSheets[styleSheet].node;
 
 				if (injectedStylesheet && injectedStylesheet.parentNode !== null) {
 
 					// remove injected stylesheets from document and delete all stored links to them
 					injectedStylesheet.parentNode.removeChild(injectedStylesheet);
-					delete injectedStyleSheets[stylesheet];
+					delete injectedStyleSheets[styleSheet];
 
 				}
 			}
 		}
 
+		// restore disabled attribute on original stylesheets
 		for (let styleSheetKey in originalStyleSheets) {
 			if (originalStyleSheets.hasOwnProperty(styleSheetKey)) {
-				this.toggleOriginalStylesheet(styleSheetKey, true);
+				this.toggleOriginalStyleSheet(styleSheetKey, true);
 			}
 		}
 
@@ -111,23 +115,27 @@ class StyleMe {
 			};
 
 			if (styleSheet.overrideOriginal === true) {
-				this.toggleOriginalStylesheet(MD5(styleSheet.src), false);
+				this.toggleOriginalStyleSheet(MD5(styleSheet.src), false);
+			}
+
+			if (styleSheet.ignoredStyleSheet.length) {
+				this.toggleOriginalStyleSheet(MD5(styleSheet.ignoredStyleSheet), false);
 			}
 
 		});
 
 	}
 
-	toggleOriginalStylesheet (styleSheetKey, enable) {
+	toggleOriginalStyleSheet (styleSheetKey, enable) {
 
-		let originalStyleSheets = this.originalStylesheets;
+		let {originalStyleSheets} = this;
 
 		if (originalStyleSheets.hasOwnProperty(styleSheetKey)) {
 
 			if (enable) {
-				originalStyleSheets[styleSheetKey].removeAttribute('disabled');
+				originalStyleSheets[styleSheetKey].node.removeAttribute('disabled');
 			} else {
-				originalStyleSheets[styleSheetKey].setAttribute('disabled', 'disabled');
+				originalStyleSheets[styleSheetKey].node.setAttribute('disabled', 'disabled');
 			}
 
 		}
@@ -142,13 +150,26 @@ class StyleMe {
 
 	}
 
+	getOriginalStyleSheets () {
+
+		let {originalStyleSheets} = this;
+
+		return Object.keys(originalStyleSheets).reduce((collection, styleSheetKey) => {
+				collection.push({
+					key: styleSheetKey,
+					src: originalStyleSheets[styleSheetKey].src
+				});
+				return collection;
+			}, []);
+	}
+
 	processAutoUpdate () {
 
 		let {enable, autoUpdate} = this.configuration;
 
 		let enableAutoUpdate = enable && autoUpdate;
 
-		let injectedStyleSheets = this.injectedStyleSheets;
+		let {injectedStyleSheets} = this;
 
 		for (let styleSheetKey in injectedStyleSheets) {
 			if (injectedStyleSheets.hasOwnProperty(styleSheetKey)) {
@@ -162,8 +183,8 @@ class StyleMe {
 
 	handleAutoUpdateInterval (styleSheetKey, enable) {
 
-		let autoUpdateIntervals = this.autoUpdateIntervals;
-		let injectedStyleSheets = this.injectedStyleSheets;
+		let {autoUpdateIntervals, injectedStyleSheets} = this;
+
 		let {updateFrequency} = this.configuration;
 
 		if (autoUpdateIntervals.hasOwnProperty(styleSheetKey)) {
@@ -194,7 +215,7 @@ class StyleMe {
 
 	removeAutoUpdateIntervals () {
 
-		let autoUpdateIntervals = this.autoUpdateIntervals;
+		let {autoUpdateIntervals} = this;
 
 		for (let styleSheetKey in autoUpdateIntervals) {
 			if (autoUpdateIntervals.hasOwnProperty(styleSheetKey)) {
