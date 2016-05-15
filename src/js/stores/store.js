@@ -7,6 +7,9 @@ import AppDispatcher from '../dispatchers/dispatcher';
 import AppConstants from '../constants/constants';
 import {Map} from 'immutable';
 import MD5 from 'MD5';
+import ConfigurationService from '../services/configuration-service';
+
+const ConfigurationServiceInstance = new ConfigurationService();
 
 class AppStore extends EventEmitter {
 
@@ -22,7 +25,8 @@ class AppStore extends EventEmitter {
 				styleSheets: []
 			}),
 			viewType: 'stylesheets', // stylesheets || options
-			configurationKey: null
+			configurationKey: null,
+			originalStyleSheets: []
 		});
 
 
@@ -70,6 +74,15 @@ class AppStore extends EventEmitter {
 
 					break;
 
+				case AppConstants.ADD_IGNORED_STYLESHEET:
+
+					this.addIgnoredStyleSheet({
+						key: 	payload.key,
+						value: 	payload.value
+					});
+
+					break;
+
 				case AppConstants.SET_ENABLE:
 
 					this.setEnable(payload.enable);
@@ -91,8 +104,12 @@ class AppStore extends EventEmitter {
 
 		});
 
-		this.getConfiguration().then(() => {
-			this.applyConfiguration();
+		this.getConfiguration().then((configuration) => {
+			this.applyConfiguration(configuration);
+		});
+
+		this.getOriginalStyleSheets().then(originalStyleSheets => {
+			this.processOriginalStyleSheets(originalStyleSheets);
 		});
 
 	}
@@ -123,64 +140,36 @@ class AppStore extends EventEmitter {
 
 	}
 
-	/**
-	 * Retrieve configuration from localStorage
-	 */
 	getConfiguration () {
 
 		return new Promise((resolve, reject) => {
-
-			let configurationKey = this.storeData.get('configurationKey');
-
-			if (configurationKey) {
-				this.getFromStorage().then(configurationData => {
-					this.processConfiguration(configurationData);
-					resolve();
+			ConfigurationServiceInstance.getConfiguration()
+				.then((configurationJSON) => {
+					this.processConfiguration(configurationJSON);
+					resolve(configurationJSON);
 				});
-			} else {
-				this.createConfigurationKey().then(() => {
-					this.getFromStorage().then(configurationData => {
-						this.processConfiguration(configurationData);
-						resolve();
-					});
-				});
-			}
 		});
 
 	}
 
-	processConfiguration (configurationData) {
+	processConfiguration (configurationJSON) {
 
-		let configurationKey = this.storeData.get('configurationKey');
+		console.log('!!!', configurationJSON);
 
-		if (configurationData.hasOwnProperty(configurationKey)) {
-			let configuration = JSON.parse(configurationData[configurationKey]);
-			this.storeData = this.storeData.update('configuration', c => Map(configuration));
-			this.emitChange();
-		}
+		let configuration = JSON.parse(configurationJSON);
+		this.storeData = this.storeData.update('configuration', c => Map(configuration));
+		this.emitChange();
 
 	}
 
-	/**
-	 * Save configuration to localStorage
-	 */
 	saveConfiguration () {
 
-		let configurationKey 	= 	this.storeData.get('configurationKey');
-		let configuration 		= 	this.storeData.get('configuration');
-		let configurationJSON 	= 	JSON.stringify(configuration);
+		let configurationJSON = JSON.stringify(this.storeData.get('configuration'));
 
-		if (configurationKey) {
-			this.setToStorage(configurationJSON).then(() => {
-				this.applyConfiguration()
+		ConfigurationServiceInstance.saveConfiguration(configurationJSON)
+			.then(() => {
+				this.applyConfiguration();
 			});
-		} else {
-			this.createConfigurationKey().then(() => {
-				this.setToStorage(configurationJSON).then(() => {
-					this.applyConfiguration();
-				});
-			});
-		}
 
 	}
 
@@ -190,62 +179,35 @@ class AppStore extends EventEmitter {
 
 		this.__sendMessage({
 			payload: {
-				action: 'applyConfiguration',
+				action: AppConstants.APPLY_CONFIGURATION,
 				configuration: self.storeData.get('configuration').toObject()
 			}
 		}).then((r) => console.log(r));
 
 	}
 
-	createConfigurationKey () {
+
+	getOriginalStyleSheets () {
 
 		return new Promise((resolve, reject) => {
 
-			chrome.tabs.getSelected(null, (tab) => {
-
-				let tabUrl = tab.url;
-				let linkParser = document.createElement('a');
-				linkParser.href = tabUrl;
-
-				this.storeData = this.storeData.update('configurationKey', c => MD5(linkParser.host));
-
-				resolve();
-
-			});
+			this.__sendMessage({
+				payload: {
+					action: AppConstants.GET_ORIGINAL_STYLESHEETS
+				}
+			}).then(originalStyleSheets => {
+				resolve(originalStyleSheets);
+			})
 
 		});
 
 	}
 
-	getFromStorage () {
+	processOriginalStyleSheets (originalStyleSheets) {
 
-		return new Promise((resolve, reject) => {
+		this.storeData = this.storeData.update('originalStyleSheets', v => originalStyleSheets);
 
-			let configurationKey = this.storeData.get('configurationKey');
-
-			chrome.storage.local.get(configurationKey, (data) => {
-				resolve(data);
-			});
-
-		});
-
-	}
-
-	setToStorage (cofigurationJSON) {
-
-		return new Promise((resolve, reject) => {
-
-			let configurationKey = this.storeData.get('configurationKey');
-
-			let configurationObject = {};
-			
-			configurationObject[configurationKey] = cofigurationJSON;
-
-			chrome.storage.local.set(configurationObject, () => {
-				resolve();
-			});
-
-		});
+		this.emitChange();
 
 	}
 
@@ -256,6 +218,8 @@ class AppStore extends EventEmitter {
 			chrome.tabs.getSelected(null, (tab) => {
 
 				chrome.tabs.sendMessage(tab.id, payload, response => {
+
+					console.warn(response);
 
 					resolve(response);
 
@@ -271,6 +235,7 @@ class AppStore extends EventEmitter {
 		let stylesheetModel = {
 			src: '',
 			overrideOriginal: true,
+			ignoredStyleSheet: '',
 			key: '' + Math.floor(Math.random() * 10e7) + (new Date()).getTime()
 		};
 
@@ -305,8 +270,8 @@ class AppStore extends EventEmitter {
 
 		this.storeData = this.storeData.updateIn(['configuration', 'styleSheets'], styleSheets => {
 
-			let stylesheetIndex = styleSheets.findIndex(stylesheet => {
-				return stylesheet.key === key;
+			let stylesheetIndex = styleSheets.findIndex(styleSheet => {
+				return styleSheet.key === key;
 			});
 
 			if (!!~stylesheetIndex) {
@@ -316,6 +281,27 @@ class AppStore extends EventEmitter {
 			return styleSheets;
 
 		});
+
+		this.emitChange();
+
+	}
+
+	addIgnoredStyleSheet ({key, value}) {
+
+		this.storeData = this.storeData.updateIn(['configuration', 'styleSheets'], styleSheets => {
+
+			let stylesheetIndex = styleSheets.findIndex(styleSheet => {
+				return styleSheet.key === key;
+			});
+
+			if (!!~stylesheetIndex) {
+				styleSheets[stylesheetIndex].ignoredStyleSheet = value;
+			}
+
+			return styleSheets;
+		});
+
+		console.warn('222', this.storeData.get('configuration').toObject());
 
 		this.emitChange();
 
