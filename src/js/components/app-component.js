@@ -21,6 +21,7 @@ class AppComponent extends React.Component {
 
 		this.state = {
 			configuration: null,
+			originalStyleSheets: [],
 			viewType: 'stylesheets'
 		};
 
@@ -44,24 +45,16 @@ class AppComponent extends React.Component {
 
 	render () {
 
-		let state,
-			configuration,
-			viewType;
+		let {state} = this;
 
-		state = this.state;
-
-		configuration = state.configuration !== null
-			? state.configuration
-			: null;
-
-		viewType = state.viewType;
+		let {configuration, viewType, originalStyleSheets} = state;
 
 		return (
 			<div>
 
 				<Tabs value={viewType}>
 					<Tab label="CSS" value="stylesheets" onClick={this.handleTabClick.bind(this, 'stylesheets')}>
-						<StylesheetsComponent configuration={configuration} />
+						<StylesheetsComponent configuration={configuration} originalStyleSheets={originalStyleSheets} />
 					</Tab>
 					<Tab label="Options" value="options" onClick={this.handleTabClick.bind(this, 'options')}>
 						<OptionsComponent configuration={configuration} />
@@ -84,12 +77,11 @@ class AppComponent extends React.Component {
 
 	updateState = () => {
 
-		let storeData;
-
-		storeData = AppStore.getStoreData();
+		let storeData = AppStore.getStoreData();
 
 		this.setState({
-			configuration: storeData.get('configuration')
+			configuration: storeData.get('configuration'),
+			originalStyleSheets: storeData.get('originalStyleSheets')
 		});
 
 	}
