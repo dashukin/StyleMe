@@ -1,20 +1,40 @@
 'use strict';
 
+import 'babel-polyfill';
 import StyleMe from './app/StyleMe';
+import AppConstants from './constants/constants';
+import ConfigurationService from './services/configuration-service';
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+const ConfigurationServiceInstance = new ConfigurationService({
+	isContentScript: true
+});
 
-	var action = request.action;
+// run initial configuration
+ConfigurationServiceInstance.getConfiguration()
+	.then(configurationJSON => {
+		StyleMe.applyConfiguration(JSON.parse(configurationJSON));
+	});
+
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+
+	let {action} = request;
 
 	switch (action) {
 
-		case 'applyConfiguration':
+		case AppConstants.APPLY_CONFIGURATION:
 
 			StyleMe.applyConfiguration(request.configuration);
 
 			sendResponse({
 				success: true
 			});
+
+			break;
+
+		case AppConstants.GET_ORIGINAL_STYLESHEETS:
+
+			sendResponse(StyleMe.getOriginalStyleSheets());
 
 			break;
 
