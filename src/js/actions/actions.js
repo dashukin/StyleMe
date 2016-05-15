@@ -26,6 +26,12 @@ export default {
 			payload: {key, value}
 		});
 	},
+	addIgnoredStyleSheetKey: ({key, value}) => {
+		AppDispatcher.dispatch({
+			actionType: AppConstants.ADD_IGNORED_STYLESHEET,
+			payload: {key, value}
+		});
+	},
 	setEnable: enable => {
 		AppDispatcher.dispatch({
 			actionType: AppConstants.SET_ENABLE,
