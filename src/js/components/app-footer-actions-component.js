@@ -4,6 +4,7 @@
 import React from 'react';
 import AppActions from '../actions/actions';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class FooterActionsComponent extends React.Component {
 
@@ -12,19 +13,22 @@ class FooterActionsComponent extends React.Component {
 	}
 
 	render () {
+
+		let {configuration} = this.props;
+
 		return (
 			<div className="footer-actions">
-				<FlatButton
-					label="Save"
+				<RaisedButton
+					label="Apply"
 					primary={true}
-					onClick={this.saveConfiguration}
+					onClick={this.applyConfiguration}
 				/>
 			</div>
 		);
 	}
 
-	saveConfiguration = () => {
-		AppActions.saveConfiguration();
+	applyConfiguration = () => {
+		AppActions.applyConfiguration();
 	}
 
 }

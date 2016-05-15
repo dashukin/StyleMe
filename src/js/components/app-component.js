@@ -11,6 +11,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import AppTheme from '../theme/app-theme.js';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
+import SettingsIcon from 'material-ui/svg-icons/action/settings';
 
 class AppComponent extends React.Component {
 
@@ -53,7 +54,11 @@ class AppComponent extends React.Component {
 			<div>
 
 				<Tabs value={viewType}>
-					<Tab label="CSS" value="stylesheets" onClick={this.handleTabClick.bind(this, 'stylesheets')}>
+					<Tab
+						label="CSS"
+						value="stylesheets"
+						onClick={this.handleTabClick.bind(this, 'stylesheets')}
+					>
 						<StylesheetsComponent configuration={configuration} originalStyleSheets={originalStyleSheets} />
 					</Tab>
 					<Tab label="Options" value="options" onClick={this.handleTabClick.bind(this, 'options')}>

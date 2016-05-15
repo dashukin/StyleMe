@@ -3,8 +3,11 @@
 
 import React from 'react';
 import AppActions from '../actions/actions';
-import Checkbox from 'material-ui/Checkbox';
 import TextField from 'material-ui/TextField';
+
+import Subheader from 'material-ui/Subheader';
+import {List, ListItem} from 'material-ui/List';
+import Toggle from 'material-ui/Toggle';
 
 class OptionsComponent extends React.Component {
 
@@ -14,43 +17,39 @@ class OptionsComponent extends React.Component {
 
 	render () {
 
-		let configuration = this.props.configuration;
+		let {configuration} = this.props;
 		let enable = configuration ? configuration.get('enable') : false;
-		let checked = configuration ? configuration.get('autoUpdate'): false;
+		let autoUpdate = configuration ? configuration.get('autoUpdate') : false;
 		let updateFrequency = configuration ? parseInt(configuration.get('updateFrequency'), 10) : 2;
 
 		return (
-			<div className="view options-view">
+			<div className="tab-view tab-view-options">
 
-				<div>
-					<Checkbox
-						label="Enable"
-						defaultChecked={enable}
-						labelPosition="right"
-						onCheck={this.handleEnabling}
-					/>
-				</div>
+				<List>
 
-				<div>
-					<Checkbox
-						label="Auto update"
-						defaultChecked={checked}
-						labelPosition="right"
-						onCheck={this.handleAutoUpdate}
-					/>
-				</div>
+					<Subheader>Base configuration:</Subheader>
 
-				<div>
-					<TextField
-						hintText="Amount of seconds"
-						floatingLabelText="Update frequency"
-						defaultValue={updateFrequency}
-						type="number"
-						min="1"
-						onChange={this.handleUpdateFrequency}
-					/>
-				</div>
+					<ListItem primaryText="Inject styles" rightToggle={<Toggle defaultToggled={enable} onToggle={this.handleEnabling} />} />
+					<ListItem primaryText="Auto update" rightToggle={<Toggle defaultToggled={autoUpdate} onToggle={this.handleAutoUpdate} />} />
 
+					{autoUpdate
+						? 	<ListItem
+								innerDivStyle={{paddingTop: 0, paddingBottom: 0, background: '#fff'}}
+							>
+								<TextField
+									floatingLabelText="Update frequency"
+									hintText="Amount of seconds"
+									defaultValue={updateFrequency}
+									type="number"
+									min="1"
+									onChange={this.handleUpdateFrequency}
+									style={{width: '100%'}}
+								/>
+							</ListItem>
+						: ''
+					}
+
+				</List>
 
 			</div>
 		);

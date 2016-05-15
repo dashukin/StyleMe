@@ -5,8 +5,11 @@ import React from 'react';
 import AppActions from '../actions/actions';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
-import IconButton from 'material-ui/IconButton';
-import DeleteIcon from 'material-ui/svg-icons/navigation/close';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import DoneIcon from 'material-ui/svg-icons/action/done';
+
+import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
+import FlatButton from 'material-ui/FlatButton';
 
 class StylesheetItemComponent extends React.Component {
 
@@ -14,13 +17,19 @@ class StylesheetItemComponent extends React.Component {
 
 		super(props);
 
+		this.state = {
+			expanded: true
+		};
+
 	}
 
 	shouldComponentUpdate (nextProps) {
-		return this.props !== nextProps;
+		return true;
 	}
 
 	render () {
+
+		let {state} = this;
 
 		let {stylesheetConfig, originalStyleSheets} = this.props;
 
@@ -29,7 +38,20 @@ class StylesheetItemComponent extends React.Component {
 		};
 
 		let autoCompleteListStyles = {
-			background: '#fff'
+			background: '#fff',
+			maxHeight: '120px',
+			overflowY: 'scroll'
+		};
+
+		let cardHeaderSubtitleStyle = {
+			display: '-webkit-box',
+			maxWidth: '470px',
+			maxHeight: '3em',
+			WebkitLineClamp: '3',
+			WebkitBoxOrient: 'vertical',
+			textOverflow: 'ellipsis',
+			overflow: 'hidden',
+			lineHeight: '1em'
 		};
 
 		let enableAutoComplete = (Object.prototype.toString.call(originalStyleSheets).slice(8, -1) === 'Array') && originalStyleSheets.length;
@@ -45,44 +67,70 @@ class StylesheetItemComponent extends React.Component {
 				}, [])
 			: [];
 
-		let autoCompleteComponent = enableAutoComplete
-			? <AutoComplete
-				hintText="Disable any existing stylesheet?"
-				searchText={stylesheetConfig.ignoredStyleSheet}
-				filter={AutoComplete.caseInsensitiveFilter}
-				fullWidth={true}
-				openOnFocus={true}
-				dataSource={autoCompleteSourceData}
-				onUpdateInput={this.onUpdateInput}
-				onNewRequest={this.onNewRequest}
-				maxSearchResults={5}
-				style={fieldStyles}
-				listStyle={autoCompleteListStyles}
-				menuStyle={{background: '#fff'}} />
-			: '';
+		let cardHeaderTitle = stylesheetConfig.src ? 'Inject: ' + stylesheetConfig.src : 'CSS path has not been provided yet...';
+		let cardHeaderSubtitle = stylesheetConfig.ignoredStyleSheet ? 'Disable: ' + stylesheetConfig.ignoredStyleSheet : null;
 
 		return (
-			<div className="stylesheet-item">
-
-				<TextField
-					ref="stylesheet-input"
-					hintText="path/to/css/file"
-					defaultValue={stylesheetConfig.src}
-					style={fieldStyles}
-					onChange={this.handleStyleInputChange}
+			<Card initiallyExpanded={!stylesheetConfig.src.length} >
+				<CardHeader
+					title={cardHeaderTitle}
+					subtitle={cardHeaderSubtitle}
+					subtitleStyle={cardHeaderSubtitleStyle}
+					actAsExpander={true}
+					showExpandableButton={true}
 				/>
+				<CardText expandable={true} style={{paddingTop: 0, paddingBottom: 0}} >
+					<TextField
+						ref="stylesheet-input"
+						hintText="path/to/css/file"
+						defaultValue={stylesheetConfig.src}
+						style={fieldStyles}
+						onChange={this.handleStyleInputChange}
+					/>
 
-				{autoCompleteComponent}
+					{enableAutoComplete
+						? 	<AutoComplete
+								hintText="Disable any existing stylesheet?"
+								searchText={stylesheetConfig.ignoredStyleSheet}
+								filter={AutoComplete.caseInsensitiveFilter}
+								fullWidth={true}
+								openOnFocus={true}
+								dataSource={autoCompleteSourceData}
+								onUpdateInput={this.onUpdateInput}
+								onNewRequest={this.onNewRequest}
+								maxSearchResults={0}
+								style={fieldStyles}
+								listStyle={autoCompleteListStyles}
+								menuStyle={{background: '#fff'}}
+							/>
+						: 	''
+					}
 
-				<IconButton
-					style={{width: '20%'}}
-					onClick={this.removeField}
-				>
-					<DeleteIcon />
-				</IconButton>
-
-			</div>
+				</CardText>
+				<CardActions expandable={true} >
+					<FlatButton
+						label="Save"
+						labelPosition="after"
+						primary={true}
+						icon={<DoneIcon />}
+						onClick={this.saveConfiguration}
+					/>
+					<FlatButton
+						label="Remove"
+						labelPosition="after"
+						secondary={true}
+						icon={<DeleteIcon />}
+						onClick={this.removeField}
+					/>
+				</CardActions>
+			</Card>
 		);
+	}
+
+	saveConfiguration = () => {
+
+		AppActions.saveConfiguration();
+
 	}
 
 	removeField = () => {
@@ -90,6 +138,7 @@ class StylesheetItemComponent extends React.Component {
 		let fieldKey = this.props.stylesheetConfig.key;
 
 		AppActions.removeField(fieldKey);
+
 	}
 
 	handleStyleInputChange = (e) => {

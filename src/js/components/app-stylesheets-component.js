@@ -5,6 +5,9 @@ import React from 'react';
 import AppActions from '../actions/actions';
 import StylesheetsItemComponent from './app-stylesheets-item-component';
 import FlatButton from 'material-ui/FlatButton';
+import AddIcon from 'material-ui/svg-icons/content/add';
+import RaisedButton from 'material-ui/RaisedButton';
+import {List, ListItem} from 'material-ui/List';
 
 const viewPrefix = 'stylesheets';
 
@@ -37,29 +40,43 @@ class StylesheetsComponent extends React.Component {
 
 		let stylesheetsData = !!configuration ? configuration.get('styleSheets') : [];
 
-		let styleSheets = stylesheetsData.map((stylesheetConfig) => {
-			return <StylesheetsItemComponent
-				key={"stylesheet-item-" + stylesheetConfig.key}
-				stylesheetConfig={stylesheetConfig}
-				originalStyleSheets={originalStyleSheets}
-			/>
+		let styleSheetsListItemStyles = {
+			padding: '0 0 10px',
+			background: '#fff'
+		};
+
+		let styleSheetsListItems = stylesheetsData.map((stylesheetConfig) => {
+			return (
+				<ListItem innerDivStyle={styleSheetsListItemStyles} key={"ListItem-" + stylesheetConfig.key}>
+					<StylesheetsItemComponent
+						stylesheetConfig={stylesheetConfig}
+						originalStyleSheets={originalStyleSheets}
+					/>
+				</ListItem>
+			);
 		});
 
 		return (
-			<div className="view stylesheets-view">
+			<div className="tab-view tab-view-stylesheets">
 
-				<div className="stylesheets-list">
-					{styleSheets}
-				</div>
+				<List>
 
-				<div className="">
-					<FlatButton
-						label="Add stylesheet"
-						disabled={false}
-						primary={true}
-						onClick={this.addField}
-					/>
-				</div>
+					{styleSheetsListItems}
+
+					<ListItem innerDivStyle={styleSheetsListItemStyles} >
+						<RaisedButton
+							label="Add stylesheet"
+							labelPosition="after"
+							icon={<AddIcon/>}
+							disabled={false}
+							primary={true}
+							onClick={this.addField}
+						/>
+					</ListItem>
+
+				</List>
+
+
 
 			</div>
 
