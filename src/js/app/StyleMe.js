@@ -23,7 +23,7 @@ class StyleMe {
 
 				collection[styleSheetKey] = {
 					node: styleSheet['ownerNode'],
-					src: styleSheet.href
+					src: styleSheet['ownerNode'].getAttribute('href')
 				};
 			}
 
