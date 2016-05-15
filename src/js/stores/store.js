@@ -6,7 +6,6 @@ import {EventEmitter} from 'events';
 import AppDispatcher from '../dispatchers/dispatcher';
 import AppConstants from '../constants/constants';
 import {Map} from 'immutable';
-import MD5 from 'MD5';
 import ConfigurationService from '../services/configuration-service';
 
 const ConfigurationServiceInstance = new ConfigurationService();
@@ -24,8 +23,8 @@ class AppStore extends EventEmitter {
 				updateFrequency: 2,
 				styleSheets: []
 			}),
-			viewType: 'stylesheets', // stylesheets || options
 			configurationKey: null,
+			configurationChanged: false,
 			originalStyleSheets: []
 		});
 
@@ -35,21 +34,23 @@ class AppStore extends EventEmitter {
 
 			switch (actionType) {
 
-				case AppConstants.SWITCH_VIEW:
-
-					this.switchView(payload.viewType);
-
-					break;
-
 				case AppConstants.GET_CONFIGURATION:
 
-					this.getConfiguration();
+					this.loadConfiguration();
 
 					break;
 
 				case AppConstants.SAVE_CONFIGURATION:
 
 					this.saveConfiguration();
+
+					break;
+
+				case AppConstants.APPLY_CONFIGURATION:
+
+					this.saveConfiguration().then(() => {
+						this.applyConfiguration();
+					});
 
 					break;
 
@@ -104,9 +105,7 @@ class AppStore extends EventEmitter {
 
 		});
 
-		this.getConfiguration().then((configuration) => {
-			this.applyConfiguration(configuration);
-		});
+		this.loadConfiguration();
 
 		this.getOriginalStyleSheets().then(originalStyleSheets => {
 			this.processOriginalStyleSheets(originalStyleSheets);
@@ -132,15 +131,7 @@ class AppStore extends EventEmitter {
 
 	}
 
-	switchView (viewType) {
-
-		this.storeData = this.storeData.update('viewType', () => viewType);
-
-		this.emitChange();
-
-	}
-
-	getConfiguration () {
+	loadConfiguration () {
 
 		return new Promise((resolve, reject) => {
 			ConfigurationServiceInstance.getConfiguration()
@@ -154,8 +145,6 @@ class AppStore extends EventEmitter {
 
 	processConfiguration (configurationJSON) {
 
-		console.log('!!!', configurationJSON);
-
 		let configuration = JSON.parse(configurationJSON);
 		this.storeData = this.storeData.update('configuration', c => Map(configuration));
 		this.emitChange();
@@ -164,25 +153,30 @@ class AppStore extends EventEmitter {
 
 	saveConfiguration () {
 
-		let configurationJSON = JSON.stringify(this.storeData.get('configuration'));
+		return new Promise((resolve, reject) => {
 
-		ConfigurationServiceInstance.saveConfiguration(configurationJSON)
-			.then(() => {
-				this.applyConfiguration();
-			});
+			let configurationJSON = JSON.stringify(this.storeData.get('configuration'));
+
+			ConfigurationServiceInstance.saveConfiguration(configurationJSON)
+				.then(() => {
+					resolve();
+				});
+		});
 
 	}
 
 	applyConfiguration () {
 
-		let self = this;
+		return new Promise((resolve, reject) => {
 
-		this.__sendMessage({
-			payload: {
-				action: AppConstants.APPLY_CONFIGURATION,
-				configuration: self.storeData.get('configuration').toObject()
-			}
-		}).then((r) => console.log(r));
+			this.__sendMessage({
+				payload: {
+					action: AppConstants.APPLY_CONFIGURATION,
+					configuration: this.storeData.get('configuration').toObject()
+				}
+			}).then((r) => resolve(r));
+
+		});
 
 	}
 
@@ -218,8 +212,6 @@ class AppStore extends EventEmitter {
 			chrome.tabs.getSelected(null, (tab) => {
 
 				chrome.tabs.sendMessage(tab.id, payload, response => {
-
-					console.warn(response);
 
 					resolve(response);
 
@@ -262,7 +254,9 @@ class AppStore extends EventEmitter {
 
 		});
 
-		this.emitChange();
+		this.saveConfiguration().then(() => {
+			this.emitChange();
+		});
 
 	}
 
@@ -301,15 +295,13 @@ class AppStore extends EventEmitter {
 			return styleSheets;
 		});
 
-		console.warn('222', this.storeData.get('configuration').toObject());
-
 		this.emitChange();
 
 	}
 
 	setEnable (enable) {
 
-		this.storeData = this.storeData.updateIn(['configuration', 'enable'], v => enable);
+		this.storeData = this.storeData.updateIn(['configuration', 'enable'], v => !this.storeData.getIn(['configuration', 'enable']));
 
 		this.emitChange();
 
@@ -317,7 +309,7 @@ class AppStore extends EventEmitter {
 
 	setAutoUpdate (autoUpdate) {
 
-		this.storeData = this.storeData.updateIn(['configuration', 'autoUpdate'], v => autoUpdate);
+		this.storeData = this.storeData.updateIn(['configuration', 'autoUpdate'], v => !this.storeData.getIn(['configuration', 'autoUpdate']));
 
 		this.emitChange();
 
