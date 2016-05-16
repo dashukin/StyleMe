@@ -100,26 +100,26 @@ class StyleMe {
 
 		styleSheets.forEach(styleSheet => {
 
-			if (!styleSheet.src) {
-				return;
-			}
+			if (styleSheet.src) {
 
-			// create new styleSheet
-			let newStylesheet = document.createElement('link');
+				// create new styleSheet
+				let newStylesheet = document.createElement('link');
 
-			newStylesheet.setAttribute('rel', 'stylesheet');
-			newStylesheet.setAttribute('type', 'text/css');
-			newStylesheet.setAttribute(this.appAttribute, 'true');
-			newStylesheet.setAttribute('href', styleSheet.src);
+				newStylesheet.setAttribute('rel', 'stylesheet');
+				newStylesheet.setAttribute('type', 'text/css');
+				newStylesheet.setAttribute(this.appAttribute, 'true');
+				newStylesheet.setAttribute('href', styleSheet.src);
 
-			this.documentHead.appendChild(newStylesheet);
-			this.injectedStyleSheets[styleSheet.key] = {
-				node: newStylesheet,
-				src: styleSheet.src
-			};
+				this.documentHead.appendChild(newStylesheet);
+				this.injectedStyleSheets[styleSheet.key] = {
+					node: newStylesheet,
+					src: styleSheet.src
+				};
 
-			if (styleSheet.overrideOriginal === true) {
-				this.toggleOriginalStyleSheet(MD5(styleSheet.src), false);
+				if (styleSheet.overrideOriginal === true) {
+					this.toggleOriginalStyleSheet(MD5(styleSheet.src), false);
+				}
+
 			}
 
 			if (styleSheet.ignoredStyleSheet.length) {
