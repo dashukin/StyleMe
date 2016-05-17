@@ -3,10 +3,13 @@ import plumber from 'gulp-plumber';
 import sass from 'gulp-sass';
 import autoprefixer from 'gulp-autoprefixer';
 import cleanCSS from 'gulp-clean-css';
+import gulpZip from 'gulp-zip';
 
 const dirs = {
 	src: './src/scss',
-	dest: './app/build/css'
+	dest: './app/build/css',
+	appSrc: './app',
+	appDest: './app-zip'
 };
 
 gulp.task('scss', () => {
@@ -23,5 +26,11 @@ gulp.task('watchScss', () => {
 });
 
 gulp.task('watch', ['scss', 'watchScss']);
+
+gulp.task('zip', () => {
+	gulp.src(`${dirs.appSrc}/**/*`)
+		.pipe(gulpZip(`StyleMe_${+(new Date())}.zip`))
+		.pipe(gulp.dest(dirs.appDest));
+});
 
 gulp.task('default', ['scss']);
