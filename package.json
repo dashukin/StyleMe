@@ -1,6 +1,6 @@
 {
   "name": "style-me",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Simple extension to dynamically inject styles into the page",
   "main": "index.js",
   "directories": {
