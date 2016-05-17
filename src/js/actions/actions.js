@@ -32,10 +32,9 @@ export default {
 			payload: {key, value}
 		});
 	},
-	setEnable: enable => {
+	toggleEnable: () => {
 		AppDispatcher.dispatch({
-			actionType: AppConstants.SET_ENABLE,
-			payload: {enable}
+			actionType: AppConstants.TOGGLE_ENABLE
 		});
 	},
 	setAutoUpdate: autoUpdate => {
@@ -53,11 +52,6 @@ export default {
 	saveConfiguration: () => {
 		AppDispatcher.dispatch({
 			actionType: AppConstants.SAVE_CONFIGURATION
-		});
-	},
-	applyConfiguration: () => {
-		AppDispatcher.dispatch({
-			actionType: AppConstants.APPLY_CONFIGURATION
 		});
 	}
 }
