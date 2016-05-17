@@ -46,14 +46,6 @@ class AppStore extends EventEmitter {
 
 					break;
 
-				case AppConstants.APPLY_CONFIGURATION:
-
-					this.saveConfiguration().then(() => {
-						this.applyConfiguration();
-					});
-
-					break;
-
 				case AppConstants.ADD_FIELD:
 
 					this.addField();
@@ -84,9 +76,9 @@ class AppStore extends EventEmitter {
 
 					break;
 
-				case AppConstants.SET_ENABLE:
+				case AppConstants.TOGGLE_ENABLE:
 
-					this.setEnable(payload.enable);
+					this.toggleEnable();
 
 					break;
 
@@ -159,6 +151,7 @@ class AppStore extends EventEmitter {
 
 			ConfigurationServiceInstance.saveConfiguration(configurationJSON)
 				.then(() => {
+					this.applyConfiguration();
 					resolve();
 				});
 		});
@@ -299,9 +292,11 @@ class AppStore extends EventEmitter {
 
 	}
 
-	setEnable (enable) {
+	toggleEnable (enable) {
 
 		this.storeData = this.storeData.updateIn(['configuration', 'enable'], v => !this.storeData.getIn(['configuration', 'enable']));
+
+		this.saveConfiguration();
 
 		this.emitChange();
 
