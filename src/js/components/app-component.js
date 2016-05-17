@@ -11,7 +11,6 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import AppTheme from '../theme/app-theme.js';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
-import SettingsIcon from 'material-ui/svg-icons/action/settings';
 
 class AppComponent extends React.Component {
 
@@ -66,7 +65,7 @@ class AppComponent extends React.Component {
 					</Tab>
 				</Tabs>
 
-				<FooterActionsComponent />
+				<FooterActionsComponent configuration={configuration} />
 
 			</div>
 		);

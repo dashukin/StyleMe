@@ -3,8 +3,9 @@
 
 import React from 'react';
 import AppActions from '../actions/actions';
-import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import {List, ListItem} from 'material-ui/List';
+import Toggle from 'material-ui/Toggle';
 
 class FooterActionsComponent extends React.Component {
 
@@ -16,19 +17,25 @@ class FooterActionsComponent extends React.Component {
 
 		let {configuration} = this.props;
 
+		let enabled = configuration
+			? configuration.get('enable')
+			: false;
+
+		let enabledText = enabled ? 'On' : 'Off';
+
 		return (
 			<div className="footer-actions">
-				<RaisedButton
-					label="Apply"
-					primary={true}
-					onClick={this.applyConfiguration}
-				/>
+
+				<List>
+					<ListItem primaryText={enabledText} rightToggle={<Toggle defaultToggled={enabled} toggled={enabled} onToggle={this.toggleEnable} />} />
+				</List>
+
 			</div>
 		);
 	}
 
-	applyConfiguration = () => {
-		AppActions.applyConfiguration();
+	toggleEnable = () => {
+		AppActions.toggleEnable();
 	}
 
 }

@@ -29,7 +29,6 @@ class OptionsComponent extends React.Component {
 
 					<Subheader>Base configuration:</Subheader>
 
-					<ListItem primaryText="Inject styles" rightToggle={<Toggle defaultToggled={enable} toggled={enable} onToggle={this.handleEnabling} />} />
 					<ListItem primaryText="Auto update" rightToggle={<Toggle defaultToggled={autoUpdate} toggled={autoUpdate} onToggle={this.handleAutoUpdate} />} />
 
 					{autoUpdate
@@ -37,7 +36,7 @@ class OptionsComponent extends React.Component {
 								innerDivStyle={{paddingTop: 0, paddingBottom: 0, background: '#fff'}}
 							>
 								<TextField
-									floatingLabelText="Update frequency"
+									floatingLabelText="Update frequency (seconds)"
 									hintText="Amount of seconds"
 									defaultValue={updateFrequency}
 									type="number"
@@ -55,9 +54,9 @@ class OptionsComponent extends React.Component {
 		);
 	}
 
-	handleEnabling = (e) => {
+	handleEnabling = () => {
 
-		AppActions.setEnable(e.target.checked);
+		AppActions.toggleEnable();
 
 	}
 
