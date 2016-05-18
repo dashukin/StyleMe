@@ -1,6 +1,9 @@
 var webpack = require('webpack');
 
-module.exports = {
+var __DEV__ =  JSON.parse(process.env.BUILD_DEV || 'false');
+var __PROD__ = JSON.parse(process.env.BUILD_PROD || 'false');
+
+var baseConfig = {
 	entry: {
 		background: './src/js/background',
 		contentscript: './src/js/contentscript',
@@ -22,4 +25,10 @@ module.exports = {
 	plugins: [
 		new webpack.NoErrorsPlugin()
 	]
+};
+
+if (__DEV__) {
+	baseConfig['devtool'] = 'cheap-module-source-map';
 }
+
+module.exports = baseConfig;

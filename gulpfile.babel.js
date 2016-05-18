@@ -4,10 +4,13 @@ import sass from 'gulp-sass';
 import autoprefixer from 'gulp-autoprefixer';
 import cleanCSS from 'gulp-clean-css';
 import gulpZip from 'gulp-zip';
+import del from 'del';
 
 const dirs = {
 	src: './src/scss',
-	dest: './app/build/css',
+	destCSS: './app/build/css',
+	destJS: './app/build/js',
+	destAll: './app/build',
 	appSrc: './app',
 	appDest: './app-zip'
 };
@@ -18,7 +21,7 @@ gulp.task('scss', () => {
 		.pipe(sass())
 		.pipe(autoprefixer())
 		.pipe(cleanCSS())
-		.pipe(gulp.dest(dirs.dest));
+		.pipe(gulp.dest(dirs.destCSS));
 });
 
 gulp.task('watchScss', () => {
@@ -31,6 +34,10 @@ gulp.task('zip', () => {
 	gulp.src(`${dirs.appSrc}/**/*`)
 		.pipe(gulpZip(`StyleMe_${+(new Date())}.zip`))
 		.pipe(gulp.dest(dirs.appDest));
+});
+
+gulp.task('cleanDest', () => {
+	del(`${dirs.destAll}/*`);
 });
 
 gulp.task('default', ['scss']);
