@@ -306,6 +306,8 @@ class AppStore extends EventEmitter {
 
 		this.storeData = this.storeData.updateIn(['configuration', 'autoUpdate'], v => !this.storeData.getIn(['configuration', 'autoUpdate']));
 
+		this.saveConfiguration();
+
 		this.emitChange();
 
 	}
@@ -313,6 +315,8 @@ class AppStore extends EventEmitter {
 	setUpdateFrequency (updateFrequency) {
 
 		this.storeData = this.storeData.updateIn(['configuration', 'updateFrequency'], v => updateFrequency);
+
+		this.saveConfiguration();
 
 		this.emitChange();
 
