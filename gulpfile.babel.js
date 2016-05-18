@@ -5,6 +5,10 @@ import autoprefixer from 'gulp-autoprefixer';
 import cleanCSS from 'gulp-clean-css';
 import gulpZip from 'gulp-zip';
 import del from 'del';
+import fs from 'fs';
+import semver from 'semver';
+import gulpBump from 'gulp-bump';
+
 
 const dirs = {
 	src: './src/scss',
@@ -12,7 +16,9 @@ const dirs = {
 	destJS: './app/build/js',
 	destAll: './app/build',
 	appSrc: './app',
-	appDest: './app-zip'
+	appDest: './app-zip',
+	manifest: './app',
+	manifestFile: './app/manifest.json'
 };
 
 gulp.task('scss', () => {
@@ -38,6 +44,18 @@ gulp.task('zip', () => {
 
 gulp.task('cleanDest', () => {
 	del(`${dirs.destAll}/*`);
+});
+
+gulp.task('incVersion', () => {
+	
+	let manifestConfiguration = JSON.parse(fs.readFileSync(dirs.manifestFile, 'utf8'));
+	let newVersion = semver.inc(manifestConfiguration.version, 'patch');
+
+	gulp.src(dirs.manifestFile)
+		.pipe(gulpBump({
+			version: newVersion
+		}))
+		.pipe(gulp.dest(dirs.manifest));
 });
 
 gulp.task('default', ['scss']);
