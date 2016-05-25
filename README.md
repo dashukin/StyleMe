@@ -2,15 +2,14 @@
 Style Me is a chrome extension for adding any hosted css files into webpage. 
 
 ####Features:
- - Add multiple links of your stylesheets.
- - Enable/disable usage of your stylesheets.
- - Autoupdate your links with specified frequency.
+ - Inject multiple stylesheets into webpage.
+ - Disable any existing original stylesheet.
+ - Enable/disable stylesheets injection.
+ - Auto update of injected stylesheets with specified frequency.
 
-####Why it was implemented:
-  Sometimes we have to add some styles to existing websites. And to be honest "sometimes" we don't have dev branch or even ftp access to website files. U're lucky if u didn't have such tasks ;) So with this extension we could just add a link to a hosted css-file, turn on "Enable" option and see our styles applied to a webpage.
-  Want some automatic update? Just enable "Autoupdate" option* and set preferable update frequency in seconds. 
-
-*Note: it takes some time depending on your internet connection to load and apply your styles into webpage. For development just use any local server so your files will load immediately.
+####Use cases:
+  - SPA development. Inject any number of stylesheets you are working with by specifying their source paths (i.e. http://localhost://myApp/styles/compiled.css) and enabling "Auto update" option with specified frequency.
+  - Correct styles that you don't like on any webpage by overriding them or providing new rules in your own stylesheet. Just share such file for example over dropbox and specify src to the raw file (just add &raw=1 to the shared link, e.g. https://www.dropbox.com/s/xxxxxx/my-css-file.css?dl=0&raw=1)
 
 #Usage
 This extension could be installed via chrome webstore. 
