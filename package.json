@@ -47,7 +47,8 @@
     "inc-version": "gulp incVersion",
     "zip-app": "gulp zip",
     "start": "BUILD_DEV=1 npm run watch-js & npm run watch-css",
-    "build": "BUILD_PROD=1 npm run clean-dest && npm run build-js && npm run build-css && npm run inc-version && npm run zip-app"
+    "patch": "npm run inc-version",
+    "build": "BUILD_PROD=1 npm run clean-dest && npm run build-js && npm run build-css && npm run zip-app"
   },
   "repository": {
     "type": "git",
