@@ -53,5 +53,17 @@ export default {
 		AppDispatcher.dispatch({
 			actionType: AppConstants.SAVE_CONFIGURATION
 		});
+	},
+	applyConfiguration: configuration => {
+		AppDispatcher.dispatch({
+			actionType: AppConstants.APPLY_CONFIGURATION,
+			payload: {configuration}
+		});
+	},
+	getOriginalStyleSheets: callback => {
+		AppDispatcher.dispatch({
+			actionType: AppConstants.GET_ORIGINAL_STYLESHEETS,
+			payload: {callback}
+		});
 	}
 }

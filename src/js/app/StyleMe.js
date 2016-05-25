@@ -1,13 +1,32 @@
 
 'use strict';
 
+import React from 'react';
+import AppDispatcher from '../dispatchers/dispatcher';
+import AppConstants from '../constants/constants';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import AppTheme from '../theme/app-theme.js';
+import Snackbar from 'material-ui/Snackbar';
 import MD5 from 'MD5';
 
-class StyleMe {
 
-	constructor () {
+class StyleMe extends React.Component {
 
-		this.configuration = null;
+	constructor (props) {
+
+		super(props);
+
+		this.state = {
+			showNotification: true,
+			notificationMessage: '',
+			notificationAction: ''
+		};
+
+		this.notifications = [];
+
+		this.configuration = {};
+
+		this.previousConfiguration = null;
 
 		this.documentHead = document.getElementsByTagName('head')[0];
 		this.appAttribute = 'data-style-me';
@@ -35,6 +54,31 @@ class StyleMe {
 
 		this.autoUpdateIntervals = {};
 
+		AppDispatcher.register(({actionType, payload}) => {
+
+			switch (actionType) {
+
+				case AppConstants.APPLY_CONFIGURATION:
+
+					this.applyConfiguration(payload.configuration);
+
+					break;
+
+				case AppConstants.GET_ORIGINAL_STYLESHEETS:
+
+					payload.callback(this.getOriginalStyleSheets());
+
+					break;
+			}
+
+		});
+
+	}
+
+	getChildContext () {
+		return {
+			muiTheme: getMuiTheme(AppTheme)
+		}
 	}
 
 	applyConfiguration (configuration) {
@@ -43,22 +87,34 @@ class StyleMe {
 
 		this.processConfiguration();
 
+		this.previousConfiguration = Object.assign({}, configuration);
+
 	}
 
 	processConfiguration () {
 
-		let {configuration} = this;
-
-		if (!(Object.prototype.toString.call(configuration).slice(8, -1) === 'Object')) {
-			return;
-		}
+		let {configuration, previousConfiguration} = this;
 
 		let {enable} = configuration;
 
 		this.destroy();
 
+		let appWasToggled = (!previousConfiguration && enable) || (previousConfiguration && (enable !== previousConfiguration.enable));
+
 		if (enable) {
 			this.init();
+		}
+
+		if (appWasToggled) {
+			this.createNotification({
+				message: 'StyleMe is ' + (enable ? 'On' : 'Off'),
+				action: null
+			});
+		} else if (previousConfiguration) {
+			this.createNotification({
+				message: 'StyleMe configuration has been updated.',
+				action: null
+			});
 		}
 
 	}
@@ -237,7 +293,57 @@ class StyleMe {
 
 	}
 
+	createNotification ({message, action}) {
+
+		this.notifications.push({message, action});
+
+		this.showNotifications();
+
+	}
+
+	showNotifications () {
+
+		let notificationData = this.notifications.shift();
+
+		if (notificationData) {
+			this.setState({
+				notificationMessage: notificationData.message,
+				notificationAction: notificationData.action
+			});
+		}
+
+	}
+
+	// Component specific methods
+
+	render () {
+
+		let styles = {
+			pointerEvents: 'none'
+		};
+
+		let {showNotification, notificationMessage, notificationAction} = this.state;
+
+		let open = showNotification === true && notificationMessage.length > 0;
+
+		return (
+			<div className="extension-styleme" style={styles}>
+
+				<Snackbar
+					open={open}
+					message={notificationMessage}
+					action={notificationAction}
+					autoHideDuration={3000}
+					style={{textAlign: 'center'}}
+				/>
+			</div>
+		);
+	}
 
 }
 
-export default new StyleMe();
+StyleMe.childContextTypes = {
+	muiTheme: React.PropTypes.object
+};
+
+export default StyleMe;

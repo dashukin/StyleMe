@@ -1,6 +1,9 @@
 'use strict';
 
 import 'babel-polyfill';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import AppActions from './actions/actions';
 import StyleMe from './app/StyleMe';
 import AppConstants from './constants/constants';
 import ConfigurationService from './services/configuration-service';
@@ -9,13 +12,19 @@ const ConfigurationServiceInstance = new ConfigurationService({
 	isContentScript: true
 });
 
+// create app holder to render StyleMe in
+let styleMeHolder = document.createElement('div');
+styleMeHolder.className = 'styleme-extension';
+document.body.appendChild(styleMeHolder);
+ReactDOM.render(<StyleMe/>, styleMeHolder);
+
 // run initial configuration
 ConfigurationServiceInstance.getConfiguration()
 	.then(configurationJSON => {
-		StyleMe.applyConfiguration(JSON.parse(configurationJSON));
+		AppActions.applyConfiguration(JSON.parse(configurationJSON));
 	});
 
-
+// create listener to handle popup messages
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 	let {action} = request;
@@ -24,7 +33,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 		case AppConstants.APPLY_CONFIGURATION:
 
-			StyleMe.applyConfiguration(request.configuration);
+			AppActions.applyConfiguration(request.configuration);
 
 			sendResponse({
 				success: true
@@ -34,7 +43,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 		case AppConstants.GET_ORIGINAL_STYLESHEETS:
 
-			sendResponse(StyleMe.getOriginalStyleSheets());
+
+			AppActions.getOriginalStyleSheets(originalStyleSheets => {
+				sendResponse(originalStyleSheets);
+			});
 
 			break;
 
