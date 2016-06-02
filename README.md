@@ -6,6 +6,7 @@ Style Me is a chrome extension for adding any hosted css files into webpage.
  - Disable any existing original stylesheet.
  - Enable/disable stylesheets injection.
  - Auto update of injected stylesheets with specified frequency.
+ - Manual update of injected stylesheets by pressing key combination (Shift + R)
 
 ####Use cases:
   - SPA development. Inject any number of stylesheets you are working with by specifying their source paths (i.e. http://localhost://myApp/styles/compiled.css) and enabling "Auto update" option with specified frequency.
