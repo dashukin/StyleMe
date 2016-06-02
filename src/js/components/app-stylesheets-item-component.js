@@ -154,6 +154,11 @@ class StylesheetItemComponent extends React.Component {
 
 	onUpdateInput = (enteredValue, dataSource) => {
 
+		AppActions.addIgnoredStyleSheetKey({
+			key: this.props.stylesheetConfig.key,
+			value: ''
+		});
+
 	}
 
 	onNewRequest = (selectedData, index) => {
@@ -163,6 +168,7 @@ class StylesheetItemComponent extends React.Component {
 			ignoredKey: selectedData.styleSheetKey,
 			value: selectedData.text
 		});
+
 	}
 
 }

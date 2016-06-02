@@ -15,11 +15,15 @@ class AppStore extends EventEmitter {
 	constructor (props) {
 
 		super(props);
-		
+
 		this.storeData = Map({
 			configuration: Map({
 				enable: false,
 				autoUpdate: false,
+				keyboardUpdate: {
+					enable: false,
+					combination: '' // TODO: add ability to create ckey combinations
+				},
 				updateFrequency: 2,
 				styleSheets: []
 			}),
@@ -93,6 +97,10 @@ class AppStore extends EventEmitter {
 					this.setUpdateFrequency(payload.updateFrequency);
 
 					break;
+
+				case AppConstants.SET_KEYBOARD_UPDATE:
+
+					this.setKeyboadUpdate(payload.keyboardUpdate);
 			}
 
 		});
@@ -137,8 +145,10 @@ class AppStore extends EventEmitter {
 
 	processConfiguration (configurationJSON) {
 
-		let configuration = JSON.parse(configurationJSON);
-		this.storeData = this.storeData.update('configuration', c => Map(configuration));
+		let currentConfiguration = this.storeData.get('configuration');
+		let newConfiguration = JSON.parse(configurationJSON);
+
+		this.storeData = this.storeData.update('configuration', c => currentConfiguration.mergeDeep(Map(newConfiguration)));
 		this.emitChange();
 
 	}
@@ -315,6 +325,19 @@ class AppStore extends EventEmitter {
 	setUpdateFrequency (updateFrequency) {
 
 		this.storeData = this.storeData.updateIn(['configuration', 'updateFrequency'], v => updateFrequency);
+
+		this.saveConfiguration();
+
+		this.emitChange();
+
+	}
+
+	setKeyboadUpdate (keyboardUpdate) {
+
+		this.storeData = this.storeData.updateIn(['configuration', 'keyboardUpdate'], v => {
+			v.enable = keyboardUpdate;
+			return v;
+		});
 
 		this.saveConfiguration();
 

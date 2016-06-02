@@ -95,7 +95,7 @@ class StyleMe extends React.Component {
 
 		let {configuration, previousConfiguration} = this;
 
-		let {enable} = configuration;
+		let {enable, keyboardUpdate} = configuration;
 
 		this.destroy();
 
@@ -104,6 +104,8 @@ class StyleMe extends React.Component {
 		if (enable) {
 			this.init();
 		}
+
+		this.toggleKeyboardUpdate(enable && keyboardUpdate.enable || false);
 
 		if (appWasToggled) {
 			this.createNotification({
@@ -210,6 +212,20 @@ class StyleMe extends React.Component {
 
 	}
 
+	toggleKeyboardUpdate (enable = false, options) {
+
+		let action = enable ? 'add' : 'remove';
+
+		document[action + 'EventListener']('keypress', this.keyPressHandler, false);
+	}
+
+	keyPressHandler = e => {
+
+		if (e.which === 82 && e.shiftKey === true) {
+			this.updateInjectedStyleSheets();
+		}
+	}
+
 	getOriginalStyleSheets () {
 
 		let {originalStyleSheets} = this;
@@ -243,7 +259,7 @@ class StyleMe extends React.Component {
 
 	handleAutoUpdateInterval (styleSheetKey, enable) {
 
-		let {autoUpdateIntervals, injectedStyleSheets} = this;
+		let {autoUpdateIntervals} = this;
 
 		let {updateFrequency} = this.configuration;
 
@@ -259,17 +275,43 @@ class StyleMe extends React.Component {
 
 			autoUpdateIntervals[styleSheetKey] = window.setInterval(() => {
 
-				let injectedStyleSheetData = injectedStyleSheets[styleSheetKey];
-
-				let injectedStyleSheet = injectedStyleSheetData.node;
-
-				let timestamp = (!!~injectedStyleSheetData.src.indexOf('?') ? '&' : '?') + 'timestamp=' + (new Date()).getTime();
-
-				injectedStyleSheet.setAttribute('href', injectedStyleSheetData.src + timestamp);
+			this.updateStyleSheetSrc(styleSheetKey);
 
 			}, updateIntervalValue);
 		}
 
+	}
+
+	updateInjectedStyleSheets () {
+
+		let {injectedStyleSheets} = this;
+
+		for (let styleSheetKey in injectedStyleSheets) {
+			if (injectedStyleSheets.hasOwnProperty(styleSheetKey)) {
+
+				this.updateStyleSheetSrc(styleSheetKey);
+
+			}
+		}
+
+		this.createNotification({
+			message: 'Injected Stylesheets have been updated',
+			action: null
+		});
+
+	}
+
+	updateStyleSheetSrc (styleSheetKey) {
+
+		let {injectedStyleSheets} = this;
+
+		let injectedStyleSheetData = injectedStyleSheets[styleSheetKey];
+
+		let injectedStyleSheet = injectedStyleSheetData.node;
+
+		let timestamp = (!!~injectedStyleSheetData.src.indexOf('?') ? '&' : '?') + 'timestamp=' + (new Date()).getTime();
+
+		injectedStyleSheet.setAttribute('href', injectedStyleSheetData.src + timestamp);
 
 	}
 

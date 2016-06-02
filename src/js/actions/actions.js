@@ -49,6 +49,12 @@ export default {
 			payload: {updateFrequency}
 		});
 	},
+	setKeyboardUpdate: keyboardUpdate => {
+		AppDispatcher.dispatch({
+			actionType: AppConstants.SET_KEYBOARD_UPDATE,
+			payload: {keyboardUpdate}
+		});
+	},
 	saveConfiguration: () => {
 		AppDispatcher.dispatch({
 			actionType: AppConstants.SAVE_CONFIGURATION

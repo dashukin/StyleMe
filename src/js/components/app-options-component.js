@@ -21,6 +21,7 @@ class OptionsComponent extends React.Component {
 		let enable = configuration ? configuration.get('enable') : false;
 		let autoUpdate = configuration ? configuration.get('autoUpdate') : false;
 		let updateFrequency = configuration ? parseInt(configuration.get('updateFrequency'), 10) : 2;
+		let keyboardUpdate = configuration ? !!configuration.get('keyboardUpdate').enable : false;
 
 		return (
 			<div className="tab-view tab-view-options">
@@ -48,6 +49,8 @@ class OptionsComponent extends React.Component {
 						: ''
 					}
 
+					<ListItem primaryText="Update by keys (Shift + R)" rightToggle={<Toggle defaultToggled={keyboardUpdate} toggled={keyboardUpdate} onToggle={this.handleKeyboardUpdate} />} />
+
 				</List>
 
 			</div>
@@ -69,6 +72,12 @@ class OptionsComponent extends React.Component {
 		let updateFrequency = Math.abs(parseInt(e.target.value, 10)) || 2;
 
 		AppActions.setUpdateFrequency(updateFrequency);
+
+	}
+
+	handleKeyboardUpdate = (e) => {
+
+		AppActions.setKeyboardUpdate(e.target.checked);
 
 	}
 
